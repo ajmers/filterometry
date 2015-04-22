@@ -1,0 +1,18 @@
+%html
+    %head
+        %title Results
+
+    %body
+        %div#users
+            %h1 Results for #{@username}
+            %div.results
+
+%script{'defer' => true, 'src' => '../scripts/results.js'}
+
+%script#user-template{"type" => "text/template"}
+    %a.user
+        %div.username
+        %div.img
+            %img
+
+
