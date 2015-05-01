@@ -46,7 +46,7 @@ end
 
 ###### API ######
 get '/api/users' do
-    @username = params[:data[:username]]
+    @username = params[:username]
 
     client = Instagram.client(:access_token => session[:access_token])
     @users = client.user_search(@username)
