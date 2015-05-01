@@ -1,6 +1,9 @@
 require "instagram"
 require "sinatra"
 require "json"
+require 'dotenv'
+
+Dotenv.load
 
 set :haml, :format => :html5
 
@@ -34,8 +37,8 @@ get "/user/:id" do
 end
 
 Instagram.configure do |config|
-  config.client_id = "5045735e3c1b410c92cd246dbe8a9821"
-  config.client_secret = "1a78b2fb6dca408a9e42f9fa01ee4d71"
+  config.client_id = ENV["CLIENT_ID"]
+  config.client_secret = ENV["CLIENT_SECRET"]
   # For secured endpoints only
   #config.client_ips = '<Comma separated list of IPs>'
 end
