@@ -15,6 +15,10 @@ body {
     display: none;
 }
 
+.result {
+    display: inline-block;
+}
+
 img {
     max-width: 100px;
     border-radius: 2px;

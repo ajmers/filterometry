@@ -9,8 +9,8 @@ $(function(){
 
     window.UserList = Backbone.Collection.extend({
         model: User,
-        fetchNewItems: function () {
-            this.fetch({data: {'username': 'amaiale'}});
+        fetchNewItems: function (data) {
+            this.fetch({data: data});
         },
 
         url: '/api/users'
@@ -43,7 +43,7 @@ $(function(){
         setContent: function() {
             this.$('a.user').attr('href', 'user/' + this.model.get('id'));
             this.$('div.username').html(this.model.get('username'));
-            this.$('div.img img').attr('src', this.model.get('profile_picture'))
+            this.$('img').attr('src', this.model.get('profile_picture'))
         },
         showUserProfile: function(ev) {
             console.log(this.model.get('username'));
@@ -60,14 +60,23 @@ $(function(){
         initialize: function() {
             Users.bind('add', this.addOne, this);
             Users.bind('all', this.render, this);
-            Users.fetchNewItems();
         },
 
         events: {
+            "submit form#user-search" : "fetchNewItems"
         },
 
         fetchNewItems: function(ev) {
-            Users.fetchNewItems();
+            ev.preventDefault();
+            var data = {};
+            for (var i = 0, len = ev.target.length; i < len; i++) {
+                var field = ev.target[i];
+                if (field.value) {
+                    data[field.name] = field.value;
+                }
+            }
+
+            Users.fetchNewItems(data);
         },
 
         addOne: function(user) {

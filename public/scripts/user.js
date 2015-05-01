@@ -25,6 +25,9 @@ $(function(){
                 text: 'Photos by Filter'
             },
             plotOptions: {
+                series: {
+                    animation: false,
+                },
                 pie: {
                     allowPointSelect: true,
                     cursor: 'pointer',
@@ -96,16 +99,27 @@ $(function(){
 
     window.PhotoList = Backbone.Collection.extend({
         model: Photo,
+        lastId: 0,
+        fetchNextSet: function(resp) {
+            var lastPhoto = resp && resp.models && resp.models[resp.models.length - 1];
+            var lastId = lastPhoto && lastPhoto.get('id');
+            Photos.lastId = lastId;
+            if (lastId) {
+                Photos.fetchNewItems();
+            }
+        },
         getUserId: function() {
             var url = document.location.pathname;
             var id = /\/user\/(\d+)/.exec(url)[1];
             return id;
         },
         fetchNewItems: function () {
-            this.fetch({data: {'id': this.getUserId()},
+            this.fetch({data: {'id': this.getUserId(), 'max_id': this.lastId || null},
                         success: function(resp) {
+                            Photos.fetchNextSet(resp);
                             console.log(resp);
-                            }}).
+                            }
+                        }).
                     then(function() {
                         createPieChart(chartSeries);
                     });

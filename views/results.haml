@@ -4,15 +4,30 @@
 
     %body
         %div#users
-            %h1 Results for #{@username}
-            %div.results
+            %div.col-lg-6
+                %div.well.bs-component
+                    %h1 Search for a user by name
+
+                    %form#user-search{:method => "POST"}
+                        %fieldset
+                            %div.form-group
+                                %label.col-log-2.control-label{:for => "username"} Username
+                                %div.col-lg-10
+                                    %input#username.form-control{:type => "text", :name => "username"}
+
+                            %div.form-group
+                                %div.col-lg-10
+                                    %button.btn.btn-primary{:type => "submit"} Submit
+
+            %div.col-lg-6
+                %h1 Results for #{@username}
+                %div.results
 
 %script{'defer' => true, 'src' => '../scripts/results.js'}
 
 %script#user-template{"type" => "text/template"}
     %a.user
         %div.username
-        %div.img
-            %img
+        %img
 
 
