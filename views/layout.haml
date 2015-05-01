@@ -1,1 +1,19 @@
-= yield
+%html
+    %head
+        %title Filterometry
+
+        / Le styles
+        %link{ :href => "/bootstrap/css/bootstrapSimplex.min.css", :type => "text/css", :rel => "stylesheet" }
+        / add body padding styles
+        %link{ :href => "/css/style.css", :type => "text/css", :rel => "stylesheet" }
+
+    %body
+        %script{ :type => "text/javascript", :src => "https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js" }
+
+        %script{'src' => '//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.7.0/underscore-min.js'}
+        %script{'src' => '//cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.2/backbone-min.js'}
+
+        = yield
+
+        / Placed at the end of the document so the pages load faster
+        %script{ :type => "text/javascript", :src =>"/bootstrap/js/bootstrap.js"}
