@@ -6,6 +6,7 @@ require 'dotenv'
 Dotenv.load
 
 set :haml, :format => :html5
+enable :sessions
 CALLBACK_URL = "http://localhost:4567/oauth/callback"
 
 get "/" do
@@ -18,9 +19,7 @@ end
 
 get "/oauth/callback" do
   response = Instagram.get_access_token(params[:code], :redirect_uri => CALLBACK_URL)
-  puts response[:access_token]
   session[:access_token] = response[:access_token]
-  puts session[:access_token]
   redirect "/search"
 end
 
@@ -67,16 +66,18 @@ get '/api/users' do
 end
 
 get '/api/photos' do
-    client = Instagram.client(:access_token => session[:access_token])
+    #client = Instagram.client(:access_token => session[:access_token])
+    #puts 'access token: ' << session[:access_token].inspect
     id = params[:id]
-    max_id = params[:max_id] or nil
-    puts max_id
 
-    photos = Instagram.user_recent_media(id, {:max_id => max_id})
-    puts photos[:code]
+    photos = Instagram.user_recent_media(id, :options => {:max_id => params[:max_id], :access_token => session[:access_token]})
 
-    puts photos.length
-    return photos.to_json
+    #begin
+    #    photos = Instagram.user_recent_media(id, {:max_id => params[:max_id]})
+    #    return photos.to_json
+    #rescue Instagram::BadRequest
+    #    status 404
+    #end
 end
 
 def get_last_id(photos)
