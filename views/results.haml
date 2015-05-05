@@ -13,14 +13,14 @@
                             %div.form-group
                                 %label.col-log-2.control-label{:for => "username"} Username
                                 %div.col-lg-10
-                                    %input#username.form-control{:type => "text", :name => "username"}
+                                    %input#username.form-control{:type => "text", :name => "username", :autocomplete => "off"}
 
                             %div.form-group
                                 %div.col-lg-10
                                     %button.btn.btn-primary{:type => "submit"} Submit
 
-            %div.col-lg-6
-                %h1 Results for #{@username}
+            %div.results-container.col-lg-6
+                %h1.results-header
                 %div.results
 
 %script{'defer' => true, 'src' => '../scripts/results.js'}

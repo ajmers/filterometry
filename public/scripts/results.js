@@ -10,7 +10,11 @@ $(function(){
     window.UserList = Backbone.Collection.extend({
         model: User,
         fetchNewItems: function (data) {
-            this.fetch({data: data});
+            this.fetch({data: data,
+                success: function() {
+                    $('div.results-container').show();
+                    $('.results-container .results-header').html('Results for ' + data.username);
+                }});
         },
 
         url: '/api/users'
@@ -60,6 +64,7 @@ $(function(){
         initialize: function() {
             Users.bind('add', this.addOne, this);
             Users.bind('all', this.render, this);
+            Users.bind('reset', this.removeViews, this);
         },
 
         events: {
@@ -68,6 +73,8 @@ $(function(){
 
         fetchNewItems: function(ev) {
             ev.preventDefault();
+            $('form#user-search button').blur();
+            Users.reset();
             var data = {};
             for (var i = 0, len = ev.target.length; i < len; i++) {
                 var field = ev.target[i];
@@ -85,7 +92,15 @@ $(function(){
         },
 
         addAll: function() {
-            Users.each(this.addOne);
+            if (Users.length) {
+                Users.each(this.addOne);
+            }
+        },
+
+        removeViews: function(col, opts) {
+            _.each(opts.previousModels, function(model){
+                model.trigger('destroy');
+            });
         }
     });
     $(function() {

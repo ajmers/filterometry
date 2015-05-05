@@ -18,6 +18,9 @@ body {
 .result {
     display: inline-block;
 }
+.results-container {
+    display: none;
+}
 
 img {
     max-width: 100px;

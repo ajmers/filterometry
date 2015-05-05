@@ -6,9 +6,22 @@ require 'dotenv'
 Dotenv.load
 
 set :haml, :format => :html5
+CALLBACK_URL = "http://localhost:4567/oauth/callback"
 
 get "/" do
-    haml :results
+  '<a href="/oauth/connect">Connect with Instagram</a>'
+end
+
+get "/oauth/connect" do
+  redirect Instagram.authorize_url(:redirect_uri => CALLBACK_URL)
+end
+
+get "/oauth/callback" do
+  response = Instagram.get_access_token(params[:code], :redirect_uri => CALLBACK_URL)
+  puts response[:access_token]
+  session[:access_token] = response[:access_token]
+  puts session[:access_token]
+  redirect "/search"
 end
 
 get "/search" do
@@ -16,24 +29,22 @@ get "/search" do
 end
 
 post "/search" do
-    puts params[:username]
     @username = params[:username]
-    puts @username
 
     client = Instagram.client(:access_token => session[:access_token])
-    puts @username
-    @users = client.user_search(@username)
-    puts @users
+    users = client.user_search(@username)
     haml :results
 end
 
 get "/user/:id" do
     client = Instagram.client(:access_token => session[:access_token])
+    puts session[:access_token]
     id = params[:id]
-    puts id
-    @user = Instagram.user(id)
-
     haml :user
+    #relationship = Instagram.user_relationship(id)
+    #puts relationship[:meta[:error]]
+    #user = Instagram.user(id)
+
 end
 
 Instagram.configure do |config|
@@ -59,8 +70,10 @@ get '/api/photos' do
     client = Instagram.client(:access_token => session[:access_token])
     id = params[:id]
     max_id = params[:max_id] or nil
+    puts max_id
 
     photos = Instagram.user_recent_media(id, {:max_id => max_id})
+    puts photos[:code]
 
     puts photos.length
     return photos.to_json
