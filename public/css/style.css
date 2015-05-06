@@ -7,12 +7,21 @@ body {
 
 .photo {
     display: inline-block;
-    border: 1px solid lightgrey;
-    margin: 5px;
+    margin: 1px;
 }
 
 .filter {
     display: none;
+}
+
+#chart {
+    position: fixed;
+    width: 30%;
+}
+
+#photos {
+    float: right;
+    width: 60%;
 }
 
 .result {
@@ -23,6 +32,7 @@ body {
 }
 
 img {
-    max-width: 100px;
+    max-width: 150px;
     border-radius: 2px;
+    padding: 10px;
 }

@@ -16,6 +16,7 @@ $(function(){
 
         var pieChart = new Highcharts.Chart({
             chart: {
+                backgroundColor: 'transparent',
                 renderTo: 'chart',
                 plotBackgroundColor: null,
                 plotBorderWidth: null,
@@ -27,12 +28,21 @@ $(function(){
             plotOptions: {
                 series: {
                     animation: false,
+                    point: {
+                        events: {
+                            click: function () {
+                                var filter = this.name;
+                                Photos.filterByFilter(filter);
+                                // this = Point
+                            }
+                        }
+                    }
                 },
                 pie: {
                     allowPointSelect: true,
                     cursor: 'pointer',
                     dataLabels: {
-                        enabled: true,
+                        enabled: false,
                         style: {
                             color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
                         }
@@ -45,51 +55,8 @@ $(function(){
                 data: getPieData(data)
             }]
         });
+        return pieChart;
 
-
-    }
-
-
-
-    function createBarChart(data) {
-        function getBarData(data) {
-            var xAxis = [];
-            var yValues = [];
-            for (var key in data) {
-                if (data.hasOwnProperty(key)) {
-                    xAxis.push(key);
-                    yValues.push(data[key]);
-                }
-            }
-        }
-
-        var filterBarChart = new Highcharts.Chart({
-            chart: {
-                renderTo: 'chart',
-                type: 'column'
-            },
-            title: {
-                text: 'Filter Breakdown'
-            },
-            xAxis: {
-                categories: xAxis
-            },
-            yAxis: {
-                min: 0,
-                labels: {
-                    enabled: false
-                },
-                title: {
-                    text: '#'
-                }
-            },
-            plotOptions: {
-                series: {
-                    stacking: 'normal'
-                }
-            },
-            series: [{name: '# Photos', data: yValues}]
-        });
     }
 
     window.Photo= Backbone.Model.extend({
@@ -99,6 +66,7 @@ $(function(){
 
     window.PhotoList = Backbone.Collection.extend({
         model: Photo,
+        currentFilter: null,
         lastId: 0,
         fetchNextSet: function(resp) {
             var lastPhoto = resp && resp.models && resp.models[resp.models.length - 1];
@@ -108,12 +76,38 @@ $(function(){
                 Photos.fetchNewItems();
             }
         },
+        filterByFilter: function(filter) {
+            if (this.currentFilter) {
+                var $toShow = $('div.photo.' + filter);
+                $toShow.fadeIn();
+            }
+            this.currentFilter = filter;
+            var $toHide = $('div.photo:not(.' + filter + ')');
+            $toHide.fadeOut();
+        },
         getUserId: function() {
             var url = document.location.pathname;
             var id = /\/user\/(\d+)/.exec(url)[1];
             return id;
         },
+        pieChart: {
+            syncColors: function() {
+                var series = this.chart.series;
+                for (var i = 0, len = series.length; i < len; i++) {
+                    var seriesi = series[i];
+                    var points = seriesi.points;
+                    for (j = 0, lenj = points.length; j < lenj; j++) {
+                        var point = points[j];
+                        var name = point.name;
+                        var color = point.color;
+                        var $photos = $('div.photo.' + name + ' img');
+                        $photos.css({'background-color': color});
+                    }
+                }
+            }
+        },
         fetchNewItems: function () {
+            var that = this;
             this.fetch({data: {'id': this.getUserId(), 'max_id': this.lastId || null},
                         success: function(resp) {
                             Photos.fetchNextSet(resp);
@@ -121,7 +115,8 @@ $(function(){
                             }
                         }).
                     then(function() {
-                        createPieChart(chartSeries);
+                        that.pieChart.chart = createPieChart(chartSeries);
+                        that.pieChart.syncColors();
                     });
         },
 
@@ -161,9 +156,11 @@ $(function(){
         },
 
         setContent: function() {
-            this.$('div.filter').html(this.model.get('filter'));
-            this.$('div.image img').attr('src',
-                this.model.attributes.images.low_resolution.url)
+            var filter = this.model.get('filter');
+            this.$('.filter').html(filter);
+            this.$('img').attr('src',
+                this.model.attributes.images.low_resolution.url);
+            this.$el.addClass(filter);
         },
         showUserProfile: function(ev) {
             console.log(this.model.get('username'));
