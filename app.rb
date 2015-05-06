@@ -10,7 +10,7 @@ enable :sessions
 CALLBACK_URL = "http://localhost:4567/oauth/callback"
 
 get "/" do
-  '<a href="/oauth/connect">Connect with Instagram</a>'
+    haml :signin
 end
 
 get "/oauth/connect" do
@@ -72,12 +72,6 @@ get '/api/photos' do
 
     photos = Instagram.user_recent_media(id, {:access_token => session[:access_token], :max_id => params[:max_id]})
     photos.to_json
-    #begin
-    #    photos = Instagram.user_recent_media(id, {:max_id => params[:max_id]})
-    #    return photos.to_json
-    #rescue Instagram::BadRequest
-    #    status 404
-    #end
 end
 
 def get_last_id(photos)

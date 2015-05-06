@@ -1,5 +1,6 @@
 
 body {
+        background-color: grey;
         padding-top: 60px;
         padding-bottom: 40px;
         padding-left: 40px;
@@ -34,5 +35,9 @@ body {
 img {
     max-width: 150px;
     border-radius: 2px;
-    padding: 10px;
+    padding: 5px;
+}
+
+a.login.btn {
+    margin: 0 auto;
 }
