@@ -22,23 +22,15 @@ $(function(){
             var that = this;
             this.fetch({success: function(resp) {
                     this.username = resp.get('username');
-                    window.Photos = new PhotoList(that)
                 }
             });
         }
     });
 
-
     window.PhotoList = Backbone.Collection.extend({
         model: Photo,
-        currentFilter: null,
+        currentFilters: [],
         lastId: 0,
-        user: {},
-        initialize: function(user) {
-            this.user.id = user.id;
-            this.user.username = user.username;
-            this.fetchNewItems();
-        },
         fetchNextSet: function(resp) {
             var lastPhoto = resp && resp.models && resp.models[resp.models.length - 1];
             var lastId = lastPhoto && lastPhoto.get('id');
@@ -47,17 +39,32 @@ $(function(){
                 Photos.fetchNewItems();
             }
         },
-        filterByFilter: function(filter) {
-            if (this.currentFilter) {
-                var $toShow = $('div.photo.' + filter);
-                $toShow.fadeIn();
-            }
-            this.currentFilter = filter;
-            var $toHide = $('div.photo:not(.' + filter + ')');
-            $toHide.fadeOut();
+        clearFilter: function() {
+            $('div.photo').fadeIn();
+        },
+        filterByFilter: function(filter, accumulate) {
+            var sfn = Filterometry.stripFilterName;
+            var filterStr = sfn(filter);
+
+            var alreadySelected = accumulate ? this.pieChart.chart.getSelectedPoints() : [];
+            var alreadySelectedFilters = $.map(alreadySelected, function(point, i) {
+                return sfn(point.name);
+            });
+
+            alreadySelectedFilters.push(filterStr);
+
+            var classnames = $.map(alreadySelectedFilters, function(point, i) {
+                return '.' + point;
+            });
+            $toShow = $(classnames.join(','));
+            $toShow.fadeIn();
+
+            var photosToHide = Filterometry.getHideElements(classnames);
+            photosToHide.fadeOut();
         },
         pieChart: {
             syncColors: function() {
+                var that = this;
                 var series = this.chart.series;
                 for (var i = 0, len = series.length; i < len; i++) {
                     var seriesi = series[i];
@@ -65,24 +72,29 @@ $(function(){
                     for (j = 0, lenj = points.length; j < lenj; j++) {
                         var point = points[j];
                         var name = point.name;
+                        var nameStr = Filterometry.stripFilterName(name);
                         var color = point.color;
-                        var $photos = $('div.photo.' + name + ' img');
+                        var $photos = $('div.photo.' + nameStr + ' img');
                         $photos.css({'background-color': color});
                     }
                 }
             }
         },
-
+        getUserId: function() {
+            var url = document.location.pathname;
+            var id = /\/user\/(\d+)/.exec(url)[1];
+            return id;
+        },
         fetchNewItems: function () {
             var that = this;
-            this.fetch({data: {'id': this.userId, 'max_id': this.lastId || null},
+            this.fetch({data: {'id': this.getUserId(), 'max_id': this.lastId || null},
                         success: function(resp) {
                             that.fetchNextSet(resp);
                             console.log(resp);
                             }
                         }).
                     then(function() {
-                        that.pieChart.chart = createPieChart(that.user.username, chartSeries);
+                        that.pieChart.chart = createPieChart(chartSeries);
                         that.pieChart.syncColors();
                     });
         },
@@ -91,6 +103,7 @@ $(function(){
     });
 
     window.SearchedUser = new User;
+    window.Photos = new PhotoList;
 
     window.PhotoView = Backbone.View.extend({
         tagName: 'div',
@@ -125,7 +138,7 @@ $(function(){
             this.$('.filter').html(filter);
             this.$('img').attr('src',
                 this.model.attributes.images.low_resolution.url);
-            this.$el.addClass(filter);
+            this.$el.addClass(Filterometry.stripFilterName(filter));
         },
 
         clear: function() {
@@ -139,6 +152,7 @@ $(function(){
         initialize: function() {
             Photos.bind('add', this.addOne, this);
             Photos.bind('all', this.render, this);
+            Photos.fetchNewItems();
         },
 
         events: {
@@ -163,7 +177,7 @@ $(function(){
 
 
 
-    function createPieChart(username, data) {
+    function createPieChart(data) {
         function getPieData(data) {
             var series = []
             for (var key in data) {
@@ -178,23 +192,32 @@ $(function(){
         var pieChart = new Highcharts.Chart({
             chart: {
                 backgroundColor: 'transparent',
+                events: {
+                    click: function() {
+                        var selected = this.getSelectedPoints();
+                        $.each(selected, function(i, p) {
+                            p.select(false);
+                        })
+                        Photos.clearFilter();
+                    }
+                },
                 renderTo: 'chart',
                 plotBackgroundColor: null,
                 plotBorderWidth: null,
                 plotShadow: false
             },
             title: {
-               text: 'Photos by Filter: ' + username
+               text: 'Photos by Filter'
             },
             plotOptions: {
                 series: {
                     animation: false,
                     point: {
                         events: {
-                            click: function () {
+                            click: function (ev) {
+                                var accumulate = ev.ctrlKey || ev.shiftKey;
                                 var filter = this.name;
-                                Photos.filterByFilter(filter);
-                                // this = Point
+                                Photos.filterByFilter(filter, accumulate);
                             }
                         }
                     }

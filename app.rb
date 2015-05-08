@@ -68,6 +68,7 @@ get '/api/photos' do
     #client = Instagram.client(:access_token => session[:access_token])
     #puts 'access token: ' << session[:access_token].inspect
     id = params[:id]
+    puts id
 
     photos = Instagram.user_recent_media(id, {:access_token => session[:access_token], :max_id => params[:max_id]})
     photos.to_json
