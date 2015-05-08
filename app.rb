@@ -1,16 +1,16 @@
 require "instagram"
 require "sinatra"
 require "json"
-require 'dotenv'
+require "dotenv"
 
 Dotenv.load
 
 set :haml, :format => :html5
 enable :sessions
-CALLBACK_URL = "http://localhost:4567/oauth/callback"
+CALLBACK_URL = ENV["CALLBACK_URL"]
 
 get "/" do
-  '<a href="/oauth/connect">Connect with Instagram</a>'
+    haml :signin
 end
 
 get "/oauth/connect" do
@@ -36,14 +36,7 @@ post "/search" do
 end
 
 get "/user/:id" do
-    client = Instagram.client(:access_token => session[:access_token])
-    puts session[:access_token]
-    id = params[:id]
     haml :user
-    #relationship = Instagram.user_relationship(id)
-    #puts relationship[:meta[:error]]
-    #user = Instagram.user(id)
-
 end
 
 Instagram.configure do |config|
@@ -55,6 +48,12 @@ end
 
 
 ###### API ######
+get '/api/user/:id' do
+    id = params[:id]
+    user = Instagram.user(id)
+    user.to_json
+end
+
 get '/api/users' do
     @username = params[:username]
 
@@ -69,15 +68,10 @@ get '/api/photos' do
     #client = Instagram.client(:access_token => session[:access_token])
     #puts 'access token: ' << session[:access_token].inspect
     id = params[:id]
+    puts id
 
-    photos = Instagram.user_recent_media(id, :options => {:max_id => params[:max_id], :access_token => session[:access_token]})
-
-    #begin
-    #    photos = Instagram.user_recent_media(id, {:max_id => params[:max_id]})
-    #    return photos.to_json
-    #rescue Instagram::BadRequest
-    #    status 404
-    #end
+    photos = Instagram.user_recent_media(id, {:access_token => session[:access_token], :max_id => params[:max_id]})
+    photos.to_json
 end
 
 def get_last_id(photos)
