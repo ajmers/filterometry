@@ -1,13 +1,13 @@
 require "instagram"
 require "sinatra"
 require "json"
-require 'dotenv'
+require "dotenv"
 
 Dotenv.load
 
 set :haml, :format => :html5
 enable :sessions
-CALLBACK_URL = "http://localhost:4567/oauth/callback"
+CALLBACK_URL = ENV["CALLBACK_URL"]
 
 get "/" do
     haml :signin
@@ -36,14 +36,7 @@ post "/search" do
 end
 
 get "/user/:id" do
-    client = Instagram.client(:access_token => session[:access_token])
-    puts session[:access_token]
-    id = params[:id]
     haml :user
-    #relationship = Instagram.user_relationship(id)
-    #puts relationship[:meta[:error]]
-    #user = Instagram.user(id)
-
 end
 
 Instagram.configure do |config|
@@ -55,6 +48,12 @@ end
 
 
 ###### API ######
+get '/api/user/:id' do
+    id = params[:id]
+    user = Instagram.user(id)
+    user.to_json
+end
+
 get '/api/users' do
     @username = params[:username]
 

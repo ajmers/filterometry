@@ -2,65 +2,30 @@ $(function(){
 
     var chartSeries = {};
 
-    function createPieChart(data) {
-        function getPieData(data) {
-            var series = []
-            for (var key in data) {
-                if (data.hasOwnProperty(key)) {
-                    var point = [key, data[key]];
-                    series.push(point);
-                }
-            }
-            return series;
-        }
-
-        var pieChart = new Highcharts.Chart({
-            chart: {
-                backgroundColor: 'transparent',
-                renderTo: 'chart',
-                plotBackgroundColor: null,
-                plotBorderWidth: null,
-                plotShadow: false
-            },
-            title: {
-                text: 'Photos by Filter'
-            },
-            plotOptions: {
-                series: {
-                    animation: false,
-                    point: {
-                        events: {
-                            click: function () {
-                                var filter = this.name;
-                                Photos.filterByFilter(filter);
-                                // this = Point
-                            }
-                        }
-                    }
-                },
-                pie: {
-                    allowPointSelect: true,
-                    cursor: 'pointer',
-                    dataLabels: {
-                        enabled: false,
-                        style: {
-                            color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
-                        }
-                    }
-                }
-            },
-            series: [{
-                type: 'pie',
-                name: 'Filters',
-                data: getPieData(data)
-            }]
-        });
-        return pieChart;
-
-    }
-
-    window.Photo= Backbone.Model.extend({
+    window.Photo = Backbone.Model.extend({
         idAttribute: "id",
+    });
+
+    window.User = Backbone.Model.extend({
+        idAttribute: "id",
+        initialize: function() {
+            this.id = this.setUserId();
+            this.url = '/api/user/' + this.id;
+            this.setUsername();
+        },
+        setUserId: function() {
+            var url = document.location.pathname;
+            var id = /\/user\/(\d+)/.exec(url)[1];
+            return id;
+        },
+        setUsername: function() {
+            var that = this;
+            this.fetch({success: function(resp) {
+                    this.username = resp.get('username');
+                    window.Photos = new PhotoList(that)
+                }
+            });
+        }
     });
 
 
@@ -68,6 +33,12 @@ $(function(){
         model: Photo,
         currentFilter: null,
         lastId: 0,
+        user: {},
+        initialize: function(user) {
+            this.user.id = user.id;
+            this.user.username = user.username;
+            this.fetchNewItems();
+        },
         fetchNextSet: function(resp) {
             var lastPhoto = resp && resp.models && resp.models[resp.models.length - 1];
             var lastId = lastPhoto && lastPhoto.get('id');
@@ -85,11 +56,6 @@ $(function(){
             var $toHide = $('div.photo:not(.' + filter + ')');
             $toHide.fadeOut();
         },
-        getUserId: function() {
-            var url = document.location.pathname;
-            var id = /\/user\/(\d+)/.exec(url)[1];
-            return id;
-        },
         pieChart: {
             syncColors: function() {
                 var series = this.chart.series;
@@ -106,16 +72,17 @@ $(function(){
                 }
             }
         },
+
         fetchNewItems: function () {
             var that = this;
-            this.fetch({data: {'id': this.getUserId(), 'max_id': this.lastId || null},
+            this.fetch({data: {'id': this.userId, 'max_id': this.lastId || null},
                         success: function(resp) {
-                            Photos.fetchNextSet(resp);
+                            that.fetchNextSet(resp);
                             console.log(resp);
                             }
                         }).
                     then(function() {
-                        that.pieChart.chart = createPieChart(chartSeries);
+                        that.pieChart.chart = createPieChart(that.user.username, chartSeries);
                         that.pieChart.syncColors();
                     });
         },
@@ -123,7 +90,7 @@ $(function(){
         url: '/api/photos'
     });
 
-    window.Photos = new PhotoList;
+    window.SearchedUser = new User;
 
     window.PhotoView = Backbone.View.extend({
         tagName: 'div',
@@ -141,8 +108,6 @@ $(function(){
             } else {
                 chartSeries[filter] = 1;
             }
-        },
-        events: {
         },
 
         render: function() {
@@ -162,9 +127,6 @@ $(function(){
                 this.model.attributes.images.low_resolution.url);
             this.$el.addClass(filter);
         },
-        showUserProfile: function(ev) {
-            console.log(this.model.get('username'));
-        },
 
         clear: function() {
             this.model.destroy();
@@ -177,7 +139,6 @@ $(function(){
         initialize: function() {
             Photos.bind('add', this.addOne, this);
             Photos.bind('all', this.render, this);
-            Photos.fetchNewItems();
         },
 
         events: {
@@ -199,4 +160,65 @@ $(function(){
     $(function() {
         window.App = new AppView;
     });
+
+
+
+    function createPieChart(username, data) {
+        function getPieData(data) {
+            var series = []
+            for (var key in data) {
+                if (data.hasOwnProperty(key)) {
+                    var point = [key, data[key]];
+                    series.push(point);
+                }
+            }
+            return series;
+        }
+
+        var pieChart = new Highcharts.Chart({
+            chart: {
+                backgroundColor: 'transparent',
+                renderTo: 'chart',
+                plotBackgroundColor: null,
+                plotBorderWidth: null,
+                plotShadow: false
+            },
+            title: {
+               text: 'Photos by Filter: ' + username
+            },
+            plotOptions: {
+                series: {
+                    animation: false,
+                    point: {
+                        events: {
+                            click: function () {
+                                var filter = this.name;
+                                Photos.filterByFilter(filter);
+                                // this = Point
+                            }
+                        }
+                    }
+                },
+                pie: {
+                    allowPointSelect: true,
+                    borderWidth: '0',
+                    cursor: 'pointer',
+                    dataLabels: {
+                        enabled: false,
+                        style: {
+                            color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+                        }
+                    }
+                }
+            },
+            series: [{
+                type: 'pie',
+                name: 'Filters',
+                data: getPieData(data)
+            }]
+        });
+        return pieChart;
+
+    }
+
 });
