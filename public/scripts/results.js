@@ -1,14 +1,12 @@
 $(function(){
 
-    //Receipt model - has date, amount, name, description, item, method, funding, expense, envelope, roommate, notes, tag and id columsn.
-
-    window.User = Backbone.Model.extend({
+    Filterometry.User = Backbone.Model.extend({
         idAttribute: "id",
     });
 
 
-    window.UserList = Backbone.Collection.extend({
-        model: User,
+    Filterometry.UserList = Backbone.Collection.extend({
+        model: Filterometry.User,
         fetchNewItems: function (data) {
             this.fetch({data: data,
                 success: function() {
@@ -20,9 +18,9 @@ $(function(){
         url: '/api/users'
     });
 
-    window.Users = new UserList;
+    Filterometry.Users = new Filterometry.UserList;
 
-    window.UserView = Backbone.View.extend({
+    Filterometry.UserView = Backbone.View.extend({
         tagName: 'div',
         className: 'result',
         template: _.template($('#user-template').html()),
@@ -59,12 +57,12 @@ $(function(){
     });
 
 
-    window.AppView = Backbone.View.extend({
+    Filterometry.AppView = Backbone.View.extend({
         el: $('#users'),
         initialize: function() {
-            Users.bind('add', this.addOne, this);
-            Users.bind('all', this.render, this);
-            Users.bind('reset', this.removeViews, this);
+            Filterometry.Users.bind('add', this.addOne, this);
+            Filterometry.Users.bind('all', this.render, this);
+            Filterometry.Users.bind('reset', this.removeViews, this);
         },
 
         events: {
@@ -74,7 +72,7 @@ $(function(){
         fetchNewItems: function(ev) {
             ev.preventDefault();
             $('form#user-search button').blur();
-            Users.reset();
+            Filterometry.Users.reset();
             var data = {};
             for (var i = 0, len = ev.target.length; i < len; i++) {
                 var field = ev.target[i];
@@ -83,11 +81,11 @@ $(function(){
                 }
             }
 
-            Users.fetchNewItems(data);
+            Filterometry.Users.fetchNewItems(data);
         },
 
         addOne: function(user) {
-            var view = new UserView({model: user});
+            var view = new Filterometry.UserView({model: user});
             this.$('div.results').append(view.render().el);
         },
 
@@ -104,6 +102,6 @@ $(function(){
         }
     });
     $(function() {
-        window.App = new AppView;
+        Filterometry.App = new Filterometry.AppView;
     });
 });

@@ -2,11 +2,11 @@ $(function(){
 
     var chartSeries = {};
 
-    window.Photo = Backbone.Model.extend({
+    Filterometry.Photo = Backbone.Model.extend({
         idAttribute: "id",
     });
 
-    window.User = Backbone.Model.extend({
+    Filterometry.User = Backbone.Model.extend({
         idAttribute: "id",
         initialize: function() {
             var that = this;
@@ -26,18 +26,18 @@ $(function(){
         }
     });
 
-    window.PhotoList = Backbone.Collection.extend({
-        model: Photo,
+    Filterometry.PhotoList = Backbone.Collection.extend({
+        model: Filterometry.Photo,
         currentFilters: [],
         mediaFetched: null,
         lastId: 0,
         fetchNextSet: function(resp) {
             var lastPhoto = resp && resp.models && resp.models[resp.models.length - 1];
             var lastId = lastPhoto && lastPhoto.get('id');
-            Photos.lastId = lastId;
+            Filterometry.Photos.lastId = lastId;
             this.mediaFetched += resp.models.length;
             if (lastId) {
-                Photos.fetchNewItems();
+                Filterometry.Photos.fetchNewItems();
             }
         },
         clearFilter: function() {
@@ -104,10 +104,10 @@ $(function(){
         url: '/api/photos'
     });
 
-    window.SearchedUser = new User;
-    window.Photos = new PhotoList;
+    Filterometry.SearchedUser = new Filterometry.User;
+    Filterometry.Photos = new Filterometry.PhotoList;
 
-    window.PhotoView = Backbone.View.extend({
+    Filterometry.PhotoView = Backbone.View.extend({
         tagName: 'div',
         className: 'photo',
         template: _.template($('#photo-template').html()),
@@ -160,32 +160,32 @@ $(function(){
     });
 
 
-    window.AppView = Backbone.View.extend({
+    Filterometry.AppView = Backbone.View.extend({
         el: $('#photos'),
         initialize: function() {
-            Photos.bind('add', this.addOne, this);
-            Photos.bind('all', this.render, this);
-            Photos.fetchNewItems();
+            Filterometry.Photos.bind('add', this.addOne, this);
+            Filterometry.Photos.bind('all', this.render, this);
+            Filterometry.Photos.fetchNewItems();
         },
 
         events: {
         },
 
         fetchNewItems: function(ev) {
-            Photos.fetchNewItems();
+            Filterometry.Photos.fetchNewItems();
         },
 
         addOne: function(photo) {
-            var view = new PhotoView({model: photo});
+            var view = new Filterometry.PhotoView({model: photo});
             this.$('div.photos').append(view.render().el);
         },
 
         addAll: function() {
-            Photos.each(this.addOne);
+            Filterometry.Photos.each(this.addOne);
         }
     });
     $(function() {
-        window.App = new AppView;
+        Filterometry.App = new Filterometry.AppView;
     });
 
 
