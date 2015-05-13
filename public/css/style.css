@@ -105,27 +105,22 @@ a.login.btn {
     height: 200px;
   position: relative;
   top: 35px;
-  width: 100%;
   overflow: hidden;
   transition: all 1s;
 }
 
-/*#film:hover {
-  width: 560px;
-}
 
 #film:hover ul {
   -webkit-transform: translatex(0px);
   -moz-transform: translatex(0px);
   transform: translatex(0px);
-}*/
+}
 
 #film ul {
-  /*-webkit-transform: translatex(-450px);
+  -webkit-transform: translatex(-450px);
   -moz-transform: translatex(-450px);
-  transform: translatex(-450px);*/
+  transform: translatex(-450px);
   transition: all 1s;
-  width: 100%;
   height: 200px;
   padding: 0;
   margin: 0;
@@ -154,34 +149,3 @@ ul li a {
   background-size: contain;
 }
 
-ul li:nth-child(1) a {
-  background-image: url('/instagram/inst1.jpg');
-}
-
-ul li:nth-child(2) a {
-  background-image: url('/instagram/inst2.jpg');
-}
-
-ul li:nth-child(3) a {
-  background-image: url('/instagram/inst3.jpg');
-}
-
-ul li:nth-child(4) a {
-  background-image: url('/instagram/inst4.jpg');
-}
-
-ul li:nth-child(5) a {
-  background-image: url('/instagram/inst5.jpg');
-}
-
-ul li:nth-child(6) a {
-  background-image: url('/instagram/inst6.jpg');
-}
-
-ul li:nth-child(7) a {
-  background-image: url('/instagram/inst7.jpg');
-}
-
-ul li:nth-child(8) a {
-  background-image: url('/instagram/inst8.jpg');
-}

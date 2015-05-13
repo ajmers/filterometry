@@ -17,23 +17,10 @@
                     %div.title-right METRY&nbsp;
 
         #film
-            %ul
-                %li
-                    %a
-                %li
-                    %a
-                %li
-                    %a
-                %li
-                    %a
-                %li
-                    %a
-                %li
-                    %a
-                %li
-                    %a
-                %li
-                    %a
+            %ul{:style => 'width: 3200px;'}
 
+%script{'defer' => true, 'src' => '../scripts/filmstrip.js'}
 
+%script#filmstrip-template{"type" => "text/template"}
+    %a
 
