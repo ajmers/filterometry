@@ -2,10 +2,38 @@
     %head
         %title Sign in to Instagram
 
-    %body
-        %div.col-lg-6
-            %div.well.bs-component
-                %a.login.btn.btn-primary{:href => '/oauth/connect'}Get Connected
+    %body#splash
+        %div#splash-header
+            %div.top-nav
+                %div.col-lg-3
+                    %a.btn.btn-default{:href => '/oauth/connect'}Connect with Instagram
+                    %a.btn.btn-default{:href => '/search'}Search by username
+
+            %div.content
+                %div.title
+                    %div.title-left FILTER
+                    %a{:href => '/oauth/connect'}
+                        %div.placeholder
+                    %div.title-right METRY&nbsp;
+
+        #film
+            %ul
+                %li
+                    %a
+                %li
+                    %a
+                %li
+                    %a
+                %li
+                    %a
+                %li
+                    %a
+                %li
+                    %a
+                %li
+                    %a
+                %li
+                    %a
 
 
 

@@ -9,32 +9,33 @@ $(function(){
     window.User = Backbone.Model.extend({
         idAttribute: "id",
         initialize: function() {
+            var that = this;
             this.id = this.setUserId();
             this.url = '/api/user/' + this.id;
-            this.setUsername();
+            this.fetch({success: function(resp) {
+                    that.username = resp.get('username');
+                    that.totalMedia = resp.get('counts')['media'];
+                }
+            });
         },
+        totalMedia: null,
         setUserId: function() {
             var url = document.location.pathname;
             var id = /\/user\/(\d+)/.exec(url)[1];
             return id;
-        },
-        setUsername: function() {
-            var that = this;
-            this.fetch({success: function(resp) {
-                    this.username = resp.get('username');
-                }
-            });
         }
     });
 
     window.PhotoList = Backbone.Collection.extend({
         model: Photo,
         currentFilters: [],
+        mediaFetched: null,
         lastId: 0,
         fetchNextSet: function(resp) {
             var lastPhoto = resp && resp.models && resp.models[resp.models.length - 1];
             var lastId = lastPhoto && lastPhoto.get('id');
             Photos.lastId = lastId;
+            this.mediaFetched += resp.models.length;
             if (lastId) {
                 Photos.fetchNewItems();
             }
@@ -87,7 +88,8 @@ $(function(){
         },
         fetchNewItems: function () {
             var that = this;
-            this.fetch({data: {'id': this.getUserId(), 'max_id': this.lastId || null},
+            var id = this.getUserId();
+            this.fetch({data: {'id': id, 'max_id': this.lastId || null},
                         success: function(resp) {
                             that.fetchNextSet(resp);
                             console.log(resp);
@@ -113,6 +115,17 @@ $(function(){
             this.model.bind('change', this.render, this);
             this.model.bind('destroy', this.remove, this);
             this.addFilterData(this.model);
+        },
+        events: {
+            'mouseenter img': 'focus',
+            'mouseout img': 'blur'
+        },
+        focus: function() {
+            console.log('mouseover');
+            this.$('img').addClass('focused');
+        },
+        blur: function() {
+
         },
         addFilterData: function(photo) {
             var filter = photo.get('filter');
@@ -207,7 +220,7 @@ $(function(){
                 plotShadow: false
             },
             title: {
-               text: 'Photos by Filter'
+               text: ''
             },
             plotOptions: {
                 series: {

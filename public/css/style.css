@@ -1,14 +1,71 @@
+/** Landing Page **/
 
+body#splash {
+    background-color: darkgrey;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+}
+
+#splash div.content {
+    position: relative;
+    margin: 0 auto;
+
+}
+
+#splash div.top-nav {
+    display: block;
+    padding-top: 10px;
+    height: 50px;
+    width: 100%;
+}
+
+.col-lg-3 {
+    float: right;
+    margin: 0 auto;
+}
+
+
+#splash div.title {
+    text-align: center;
+    font-family: 'Syncopate', sans-serif;
+    font-size: 100px;
+    font-weight: bold;
+}
+
+#splash .title .placeholder {
+    position: relative;
+    top: 20px;
+    width: 115px;
+    height: 100px;
+    display: inline-block;
+    background: url(/Glyph_Logo_thumbnail200.png) no-repeat center;
+    background-size: 100px;
+}
+#splash .title-left {
+    display: inline-block;
+    position: relative;
+    right: -40px;
+}
+#splash .title-right {
+    display: inline-block;
+    position: relative;
+    left: -40px;
+}
+
+/* */
 body {
-        background-color: lightgrey;
-        padding-top: 60px;
-        padding-bottom: 40px;
-        padding-left: 40px;
+    background-color: lightgrey;
+    padding-top: 60px;
+    padding-bottom: 40px;
+    padding-left: 40px;
 }
 
 .photo {
     display: inline-block;
     margin: 1px;
+    padding: 5px 0 4px;
 }
 
 .filter {
@@ -40,4 +97,91 @@ img {
 
 a.login.btn {
     margin: 0 auto;
+}
+
+/** Filmstrip */
+#film {
+    overflow: hidden;
+    height: 200px;
+  position: relative;
+  top: 35px;
+  width: 100%;
+  overflow: hidden;
+  transition: all 1s;
+}
+
+/*#film:hover {
+  width: 560px;
+}
+
+#film:hover ul {
+  -webkit-transform: translatex(0px);
+  -moz-transform: translatex(0px);
+  transform: translatex(0px);
+}*/
+
+#film ul {
+  /*-webkit-transform: translatex(-450px);
+  -moz-transform: translatex(-450px);
+  transform: translatex(-450px);*/
+  transition: all 1s;
+  width: 100%;
+  height: 200px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  border-style: solid;
+  border-width: 17px 0px;
+  -moz-border-image: url(http://i.imgur.com/Sm9CNai.png) 27 repeat stretch;
+  -webkit-border-image: url(http://i.imgur.com/Sm9CNai.png) 27 repeat stretch;
+  -o-border-image: url(http://i.imgur.com/Sm9CNai.png) 27 repeat stretch;
+  border-image: url(http://i.imgur.com/Sm9CNai.png) 27 fill repeat stretch;
+}
+
+ul li {
+  display: block;
+  width: 160px;
+  height: 160px;
+  margin: 3px 0px 20px 20px;
+  background: #000;
+  float: left;
+}
+
+ul li a {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background-size: contain;
+}
+
+ul li:nth-child(1) a {
+  background-image: url('/instagram/inst1.jpg');
+}
+
+ul li:nth-child(2) a {
+  background-image: url('/instagram/inst2.jpg');
+}
+
+ul li:nth-child(3) a {
+  background-image: url('/instagram/inst3.jpg');
+}
+
+ul li:nth-child(4) a {
+  background-image: url('/instagram/inst4.jpg');
+}
+
+ul li:nth-child(5) a {
+  background-image: url('/instagram/inst5.jpg');
+}
+
+ul li:nth-child(6) a {
+  background-image: url('/instagram/inst6.jpg');
+}
+
+ul li:nth-child(7) a {
+  background-image: url('/instagram/inst7.jpg');
+}
+
+ul li:nth-child(8) a {
+  background-image: url('/instagram/inst8.jpg');
 }
