@@ -211,7 +211,7 @@ $(function(){
                         $.each(selected, function(i, p) {
                             p.select(false);
                         })
-                        Photos.clearFilter();
+                        Filterometry.Photos.clearFilter();
                     }
                 },
                 renderTo: 'chart',
@@ -230,7 +230,7 @@ $(function(){
                             click: function (ev) {
                                 var accumulate = ev.ctrlKey || ev.shiftKey;
                                 var filter = this.name;
-                                Photos.filterByFilter(filter, accumulate);
+                                Filterometry.Photos.filterByFilter(filter, accumulate);
                             }
                         }
                     }
