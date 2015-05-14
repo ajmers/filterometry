@@ -1,6 +1,6 @@
 /** Landing Page **/
 
-body#splash {
+body {
     background-color: darkgrey;
     margin: 0;
     padding: 0;
@@ -14,11 +14,14 @@ body#splash {
 
 }
 
-#splash div.top-nav {
+#splash nav.navbar {
     display: block;
     padding-top: 10px;
-    height: 50px;
     width: 100%;
+}
+
+#splash .btn-default.auth {
+    margin-top: 2px;
 }
 
 .col-lg-3 {
@@ -53,14 +56,52 @@ body#splash {
     position: relative;
     left: -40px;
 }
-
-/* */
-body {
-    background-color: lightgrey;
-    padding-top: 60px;
-    padding-bottom: 40px;
-    padding-left: 40px;
+/* User results */
+.user-image-container {
+    box-shadow: rgba(0, 0, 0, 0.0392157) 0px 0px 0px 1px, rgba(0, 0, 0, 0.0980392) 0px 1px 5px 0px;
+    padding: 5px;
+    background-color: #FFFFFF;
+    border: 1px solid rgba(204, 204, 204, 0.8);
 }
+
+img.user-image {
+    max-width: 150px;
+    border-radius: 2px;
+    }
+
+span.username {
+    padding-left: 6px;
+    color: black;   margin: 0 0 -16px;   max-height: 16px;
+    /* text-shadow: 0 1px 0 rgba(255,255,255,.8); */
+    line-height: 16px;
+    font-size: 13px;
+    font-weight: 400;
+    font-family: "proxima-nova","Helvetica Neue",Arial,Helvetica,sans-serif;
+}
+
+a.user-result {
+    background-color: white;
+}
+
+.result {
+    /* background-color: white; */
+    margin: 5px;
+    display: inline-block;
+}
+
+.result {
+}
+.results-container {
+    display: none;
+}
+
+a.user-result:hover {
+    text-decoration: none;
+}
+
+
+
+/* Photo results */
 
 .photo {
     display: inline-block;
@@ -82,18 +123,13 @@ body {
     width: 60%;
 }
 
-.result {
-    display: inline-block;
-}
-.results-container {
-    display: none;
-}
-
-img {
+#photos img {
     max-width: 150px;
     border-radius: 2px;
     padding: 5px;
 }
+
+
 
 a.login.btn {
     margin: 0 auto;

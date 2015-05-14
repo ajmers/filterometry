@@ -10,7 +10,7 @@ enable :sessions
 CALLBACK_URL = ENV["CALLBACK_URL"]
 
 get "/" do
-    haml :signin
+    haml :index
 end
 
 get "/oauth/connect" do
@@ -24,11 +24,17 @@ get "/oauth/callback" do
 end
 
 get "/search" do
+    @username = params[:username]
+    puts @username
+
+    client = Instagram.client(:access_token => session[:access_token])
+    users = client.user_search(@username)
     haml :results
 end
 
 post "/search" do
     @username = params[:username]
+    puts @username
 
     client = Instagram.client(:access_token => session[:access_token])
     users = client.user_search(@username)
@@ -50,7 +56,13 @@ end
 ###### API ######
 get '/api/user/:id' do
     id = params[:id]
-    user = Instagram.user(id)
+
+    begin
+        user = Instagram.user(id)
+    rescue Instagram::BadRequest
+        status 400
+        return {:error => '400'}.to_json
+    end
     user.to_json
 end
 
@@ -65,13 +77,17 @@ get '/api/users' do
 end
 
 get '/api/photos' do
-    #client = Instagram.client(:access_token => session[:access_token])
-    #puts 'access token: ' << session[:access_token].inspect
     id = params[:id]
     puts id
 
-    photos = Instagram.user_recent_media(id, {:access_token => session[:access_token], :max_id => params[:max_id]})
-    photos.to_json
+    begin
+        response = Instagram.user_recent_media(id, {:access_token => session[:access_token], :max_id => params[:max_id]})
+    rescue Instagram::BadRequest
+        status 400
+        return {:error => '400'}.to_json
+    end
+
+    response.to_json
 end
 
 def get_last_id(photos)

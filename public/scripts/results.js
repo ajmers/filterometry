@@ -2,6 +2,7 @@ $(function(){
 
     Filterometry.User = Backbone.Model.extend({
         idAttribute: "id",
+        urlRoot: "/api/user/"
     });
 
 
@@ -29,7 +30,7 @@ $(function(){
             this.model.bind('destroy', this.remove, this);
         },
         events: {
-            'click div.img': 'showUserProfile'
+            'click a.user-result': 'checkUserProfile'
         },
 
         render: function() {
@@ -43,11 +44,18 @@ $(function(){
         },
 
         setContent: function() {
-            this.$('a.user').attr('href', 'user/' + this.model.get('id'));
-            this.$('div.username').html(this.model.get('username'));
-            this.$('img').attr('src', this.model.get('profile_picture'))
+            this.$('a.user-result').attr('href', 'user/' + this.model.get('id'));
+            this.$('span.username').html(this.model.get('username'));
+            this.$('img.user-image').attr('src', this.model.get('profile_picture'))
         },
-        showUserProfile: function(ev) {
+        checkUserProfile: function(ev) {
+            ev.preventDefault();
+            var user = this.model.fetch().
+                    then(function(resp) {
+                        console.log(resp);
+                    }, function(err) {
+                        console.log(err);
+                    });
             console.log(this.model.get('username'));
         },
 
@@ -63,8 +71,21 @@ $(function(){
             Filterometry.Users.bind('add', this.addOne, this);
             Filterometry.Users.bind('all', this.render, this);
             Filterometry.Users.bind('reset', this.removeViews, this);
+            var queryUsername = this.getQueryUsername();
+            if (queryUsername) {
+                Filterometry.Users.fetchNewItems(queryUsername);
+            }
         },
 
+        getQueryUsername: function() {
+            var queryParams = $.getQueryParameters();
+            for (key in queryParams) {
+                if (queryParams.hasOwnProperty(key) && key !== 'username') {
+                    delete queryParams[key];
+                }
+            }
+            return queryParams;
+        },
         events: {
             "submit form#user-search" : "fetchNewItems"
         },
@@ -102,6 +123,12 @@ $(function(){
         }
     });
     $(function() {
+        jQuery.extend({
+
+            getQueryParameters : function(str) {
+	            return (str || document.location.search).replace(/(^\?)/,'').split("&").map(function(n){return n = n.split("="),this[n[0]] = n[1],this}.bind({}))[0];
+            }
+        });
         Filterometry.App = new Filterometry.AppView;
     });
 });

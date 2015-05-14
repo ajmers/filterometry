@@ -3,31 +3,28 @@
         %title Results
 
     %body
+        %nav.navbar
+            .container-fluid
+                .navbar-header.navbar-right
+                    //%a.btn.btn-default.auth{:href => '/oauth/connect'}Connect with Instagram
+                    %form#user-search.navbar-form.navbar-right{ :action => '/search', :method => 'GET'}
+                        %div.form-group
+                            %input.form-control{ :type => "text", :placeholder => "Search", :name => 'username'}
+                        %button.btn.btn-default{ :type => "submit"}Search by Username
+
         %div#users
-            %div.col-lg-6
-                %div.well.bs-component
-                    %h1 Search for a user by name
-
-                    %form#user-search{:method => "POST"}
-                        %fieldset
-                            %div.form-group
-                                %label.col-log-2.control-label{:for => "username"} Username
-                                %div.col-lg-10
-                                    %input#username.form-control{:type => "text", :name => "username", :autocomplete => "off"}
-
-                            %div.form-group
-                                %div.col-lg-10
-                                    %button.btn.btn-primary{:type => "submit"} Submit
-
-            %div.results-container.col-lg-6
+            %div.results-container.col-lg-12
                 %h1.results-header
                 %div.results
 
 %script{'defer' => true, 'src' => '../scripts/results.js'}
 
 %script#user-template{"type" => "text/template"}
-    %a.user
-        %div.username
-        %img
+    %a.user-result
+        %div.username-container
+            %span.username
+
+        %div.user-image-container
+            %img.user-image
 
 

@@ -14,13 +14,13 @@
         %link{ :href => "/favicon-16x16.png", :sizes => "16x16", :type => "image/png", :rel => "icon" }
         %link{ :href => "/favicon-96x96.png", :sizes => "96x96", :type => "image/png", :rel => "icon" }
 
-    %body
         %script{ :type => "text/javascript", :src => "https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js" }
         %script{ :type => "text/javascript", :src => "../scripts/filterometry.js" }
 
         %script{'src' => '//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.7.0/underscore-min.js'}
         %script{'src' => '//cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.2/backbone-min.js'}
 
+    %body
         = yield
 
         / Placed at the end of the document so the pages load faster
