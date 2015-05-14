@@ -27,4 +27,16 @@
         %div.user-image-container
             %img.user-image
 
-
+%script#modal-template{"type" => "text/template"}
+    .modal-dialog
+        .modal-content
+            .modal-header
+                %button.close{:type => "button", 'data-dismiss' => "modal", 'aria-hidden' => "true"}x
+                %h4.modal-title Authentication Required
+            .modal-body
+                %p
+                    %span You must be authentated and following
+                    %span.username
+                    %span in order to view this user.
+            .modal-footer
+                %button.btn.btn-default.close{:type => "button", 'data-dismiss' => "modal"}Close

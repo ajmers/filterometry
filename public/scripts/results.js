@@ -21,6 +21,31 @@ $(function(){
 
     Filterometry.Users = new Filterometry.UserList;
 
+    Filterometry.NoAuthView = Backbone.View.extend({
+        tagName: 'div',
+        className: 'modal',
+        events: {
+            'click button.close': 'destroy_view'
+        },
+        destroy_view: function() {
+            // COMPLETELY UNBIND THE VIEW
+            this.undelegateEvents();
+            this.$el.removeData().unbind();
+            // Remove view from DOM
+            this.remove();
+            Backbone.View.prototype.remove.call(this);
+        },
+        template: _.template($('#modal-template').html()),
+        render: function() {
+            $(this.el).html(this.template(this.model.toJSON()));
+            this.setContent();
+            return this;
+        },
+        setContent: function() {
+            this.$('span.username').html(this.model.get('username'));
+        },
+    });
+
     Filterometry.UserView = Backbone.View.extend({
         tagName: 'div',
         className: 'result',
@@ -50,11 +75,17 @@ $(function(){
         },
         checkUserProfile: function(ev) {
             ev.preventDefault();
+            var that = this;
             var user = this.model.fetch().
                     then(function(resp) {
                         console.log(resp);
+                        var href = $(ev.currentTarget).attr("href");
+                        window.location.pathname = href;
                     }, function(err) {
                         console.log(err);
+                        var noAuthModal = new Filterometry.NoAuthView({model: that.model});
+                        that.$el.append(noAuthModal.render().el);
+                        noAuthModal.$el.show();
                     });
             console.log(this.model.get('username'));
         },
