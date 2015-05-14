@@ -12,11 +12,11 @@ $(function(){
             var that = this;
             this.id = this.setUserId();
             this.url = '/api/user/' + this.id;
-            this.fetch({success: function(resp) {
-                    that.username = resp.get('username');
-                    that.totalMedia = resp.get('counts')['media'];
-                }
-            });
+            //this.fetch({success: function(resp) {
+            //        that.username = resp.get('username');
+            //        that.totalMedia = resp.get('counts')['media'];
+            //    }
+            //});
         },
         totalMedia: null,
         setUserId: function() {
@@ -90,6 +90,7 @@ $(function(){
             var that = this;
             var id = this.getUserId();
             this.fetch({data: {'id': id, 'max_id': this.lastId || null},
+                        add: true,
                         success: function(resp) {
                             that.fetchNextSet(resp);
                             console.log(resp);
@@ -104,7 +105,6 @@ $(function(){
         url: '/api/photos'
     });
 
-    Filterometry.SearchedUser = new Filterometry.User;
     Filterometry.Photos = new Filterometry.PhotoList;
 
     Filterometry.PhotoView = Backbone.View.extend({
@@ -165,7 +165,14 @@ $(function(){
         initialize: function() {
             Filterometry.Photos.bind('add', this.addOne, this);
             Filterometry.Photos.bind('all', this.render, this);
-            Filterometry.Photos.fetchNewItems();
+            Filterometry.SearchedUser = new Filterometry.User;
+            Filterometry.SearchedUser.fetch({success: function(resp) {
+                    this.username = resp.get('username');
+                    this.totalMedia = resp.get('counts')['media'];
+                    }
+                }).then(function() {
+                    Filterometry.Photos.fetchNewItems();
+                });
         },
 
         events: {
@@ -184,9 +191,8 @@ $(function(){
             Filterometry.Photos.each(this.addOne);
         }
     });
-    $(function() {
+
         Filterometry.App = new Filterometry.AppView;
-    });
 
 
 

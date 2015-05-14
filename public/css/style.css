@@ -106,7 +106,6 @@ a.user-result:hover {
 .photo {
     display: inline-block;
     margin: 1px;
-    padding: 5px 0 4px;
 }
 
 .filter {
@@ -125,8 +124,7 @@ a.user-result:hover {
 
 #photos img {
     max-width: 150px;
-    border-radius: 2px;
-    padding: 5px;
+    padding: 3px;
 }
 
 
