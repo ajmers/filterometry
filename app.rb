@@ -24,11 +24,11 @@ get "/oauth/callback" do
 end
 
 get "/search" do
-    @username = params[:username]
-    puts @username
+    #@username = params[:username]
+    #puts @username
 
-    client = Instagram.client(:access_token => session[:access_token])
-    users = client.user_search(@username)
+    #client = Instagram.client(:access_token => session[:access_token])
+    #users = client.user_search(@username)
     haml :results
 end
 
