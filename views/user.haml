@@ -3,6 +3,14 @@
         %title User Images
 
     %body
+        %nav.navbar
+            .container-fluid
+                .navbar-header.navbar-right
+                    %form#user-search.navbar-form.navbar-right{ :action => '/search', :method => 'GET'}
+                        %div.form-group
+                            %input.form-control{ :type => "text", :placeholder => "Search", :name => 'username'}
+                        %button.btn.btn-default{ :type => "submit"}Search by Username
+
         %div#chart
         %div#photos
             // %h3 #{@user.username}
