@@ -188,7 +188,40 @@ $(function(){
         Filterometry.App = new Filterometry.AppView;
     });
 
-
+    Filterometry.generalChartsConfig = {
+        chart: {
+            backgroundColor: 'transparent',
+            events: {
+                click: function() {
+                    var selected = this.getSelectedPoints();
+                    $.each(selected, function(i, p) {
+                        p.select(false);
+                    })
+                    Filterometry.Photos.clearFilter();
+                }
+            },
+            plotBackgroundColor: null,
+            plotBorderWidth: null,
+            plotShadow: false
+        },
+        title: {
+           text: ''
+        },
+        plotOptions: {
+            series: {
+                animation: false,
+                point: {
+                    events: {
+                        click: function (ev) {
+                            var accumulate = ev.ctrlKey || ev.shiftKey;
+                            var filter = this.name;
+                            Filterometry.Photos.filterByFilter(filter, accumulate);
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     function createPieChart(data) {
         function getPieData(data) {
@@ -202,39 +235,11 @@ $(function(){
             return series;
         }
 
-        var pieChart = new Highcharts.Chart({
+        var pieOptions = {
             chart: {
-                backgroundColor: 'transparent',
-                events: {
-                    click: function() {
-                        var selected = this.getSelectedPoints();
-                        $.each(selected, function(i, p) {
-                            p.select(false);
-                        })
-                        Filterometry.Photos.clearFilter();
-                    }
-                },
-                renderTo: 'chart',
-                plotBackgroundColor: null,
-                plotBorderWidth: null,
-                plotShadow: false
-            },
-            title: {
-               text: ''
+               renderTo: 'chart'
             },
             plotOptions: {
-                series: {
-                    animation: false,
-                    point: {
-                        events: {
-                            click: function (ev) {
-                                var accumulate = ev.ctrlKey || ev.shiftKey;
-                                var filter = this.name;
-                                Filterometry.Photos.filterByFilter(filter, accumulate);
-                            }
-                        }
-                    }
-                },
                 pie: {
                     allowPointSelect: true,
                     borderWidth: '0',
@@ -252,9 +257,43 @@ $(function(){
                 name: 'Filters',
                 data: getPieData(data)
             }]
-        });
-        return pieChart;
+        };
 
+        var pieConfig = jQuery.extend(true, pieOptions, Filterometry.generalChartsConfig);
+        var pieChart = new Highcharts.Chart(pieConfig);
+        return pieChart;
+    }
+
+    function createBarChart(data) {
+        var barChartData = [];
+        for (var key in data) {
+            if (data.hasOwnProperty(key)) {
+                var filterPoint = {};
+                filterPoint.name = key;
+                filterPoint.data = [data[key]];
+                barChartData.push(filterPoint);
+            }
+        }
+
+        var barOptions = {
+            chart: {
+                renderTo: 'barChart',
+                type: 'column'
+            },
+            legend: {
+                enabled: false,
+                },
+            title: {
+                text: 'Filter Breakdown'
+            },
+            xAxis: {
+                categories: ['Filters']
+            },
+            series: barChartData
+        };
+        var barConfig = jQuery.extend(true, barOptions,
+                Filterometry.generalChartsConfig)
+        var barChart = new Highcharts.Chart(barConfig);
     }
 
 });
