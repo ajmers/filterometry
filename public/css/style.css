@@ -14,10 +14,20 @@ body {
 
 }
 
-#splash nav.navbar {
+nav.navbar {
+    position: fixed;
+    top: 0;
     display: block;
     padding-top: 10px;
+    margin-bottom: 0px;
     width: 100%;
+}
+
+a.navbar-brand {
+    font-size: 30px;
+    font-family: 'Syncopate', sans-serif;
+    text-transform: uppercase;
+    font-weight: 700;
 }
 
 #splash .btn-default.auth {
@@ -29,6 +39,9 @@ body {
     margin: 0 auto;
 }
 
+#splash nav.navbar {
+    position: relative;
+}
 
 #splash div.title {
     text-align: center;
@@ -65,9 +78,16 @@ body {
     #splash .title .spacer {
         display: none;
     }
+    nav.navbar {
+        position: relative;
+    }
 }
 
 /* User results */
+#pageContent {
+    margin-top: 52px;
+}
+
 .progress {
     background-color: transparent;
 }
