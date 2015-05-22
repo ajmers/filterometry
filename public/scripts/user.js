@@ -12,13 +12,7 @@ $(function(){
             var that = this;
             this.id = this.setUserId();
             this.url = '/api/user/' + this.id;
-            //this.fetch({success: function(resp) {
-            //        that.username = resp.get('username');
-            //        that.totalMedia = resp.get('counts')['media'];
-            //    }
-            //});
         },
-        totalMedia: null,
         setUserId: function() {
             var url = document.location.pathname;
             var id = /\/user\/(\d+)/.exec(url)[1];
@@ -29,15 +23,29 @@ $(function(){
     Filterometry.PhotoList = Backbone.Collection.extend({
         model: Filterometry.Photo,
         currentFilters: [],
+        totalMedia: null,
         mediaFetched: null,
+        percentDone: null,
         lastId: 0,
         fetchNextSet: function(resp) {
             var lastPhoto = resp && resp.models && resp.models[resp.models.length - 1];
             var lastId = lastPhoto && lastPhoto.get('id');
             Filterometry.Photos.lastId = lastId;
             this.mediaFetched += resp.models.length;
+            this.updateProgressBar();
             if (lastId) {
                 Filterometry.Photos.fetchNewItems();
+            }
+        },
+        updateProgressBar: function() {
+            this.percentDone = this.mediaFetched / this.totalMedia;
+            var $progressBar = $('.progress-bar');
+            var percentage = this.percentDone * 100 + '%';
+            $progressBar.width(percentage);
+            if (this.percentDone === 1) {
+                setTimeout(function() {
+                    $('.progress').fadeTo(1000, 0);
+                }, 1000);
             }
         },
         clearFilter: function() {
@@ -168,7 +176,7 @@ $(function(){
             Filterometry.SearchedUser = new Filterometry.User;
             Filterometry.SearchedUser.fetch({success: function(resp) {
                     this.username = resp.get('username');
-                    this.totalMedia = resp.get('counts')['media'];
+                    Filterometry.Photos.totalMedia = resp.get('counts')['media'];
                     }
                 }).then(function() {
                     Filterometry.Photos.fetchNewItems();

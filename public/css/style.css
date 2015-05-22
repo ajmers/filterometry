@@ -57,6 +57,10 @@ body {
     left: -40px;
 }
 /* User results */
+.progress {
+    background-color: transparent;
+}
+
 .user-image-container {
     box-shadow: rgba(0, 0, 0, 0.0392157) 0px 0px 0px 1px, rgba(0, 0, 0, 0.0980392) 0px 1px 5px 0px;
     padding: 5px;
