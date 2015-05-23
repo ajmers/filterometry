@@ -6,3 +6,4 @@ gem 'shotgun'
 gem 'sinatra', '1.3.5'
 gem 'instagram'
 gem 'dotenv'
+gem "sinatra-cross_origin", "~> 0.3.1"

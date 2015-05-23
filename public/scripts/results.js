@@ -36,13 +36,14 @@ $(function(){
             Backbone.View.prototype.remove.call(this);
         },
         template: _.template($('#modal-template').html()),
-        render: function() {
+        render: function(ev) {
             $(this.el).html(this.template(this.model.toJSON()));
             this.setContent();
             return this;
         },
         setContent: function() {
-            this.$('span.username').html(this.model.get('username'));
+            var username = this.model.get('username');
+            this.$('span.username').html(username);
         },
     });
 

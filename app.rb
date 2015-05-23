@@ -2,14 +2,22 @@ require "instagram"
 require "sinatra"
 require "json"
 require "dotenv"
+require 'sinatra/cross_origin'
+
+enable :cross_origin
 
 Dotenv.load
 
 set :haml, :format => :html5
 enable :sessions
 CALLBACK_URL = ENV["CALLBACK_URL"]
+REDIRECT_URL = "/"
 
 get "/" do
+    if !session[:access_token].nil?
+        puts session[:access_token]
+        @signed_in = true
+    end
     haml :index
 end
 
@@ -20,21 +28,35 @@ end
 get "/oauth/callback" do
   response = Instagram.get_access_token(params[:code], :redirect_uri => CALLBACK_URL)
   session[:access_token] = response[:access_token]
-  redirect "/search"
+
+  redirect REDIRECT_URL
 end
 
 get "/search" do
-    #@username = params[:username]
-    #puts @username
+    REDIRECT_URL = "/search"
+    puts session[:access_token]
+    if !session[:access_token].nil?
+        puts session[:access_token]
+        @signed_in = true
+    else
+        puts session[:access_token]
+        @signed_in = false
+    end
+    puts @signed_in
 
-    #client = Instagram.client(:access_token => session[:access_token])
-    #users = client.user_search(@username)
     haml :results
 end
 
 post "/search" do
+    REDIRECT_URL = "/search"
     @username = params[:username]
     puts @username
+    if !session[:access_token].nil?
+        puts session[:access_token]
+        @signed_in = true
+    else
+        @signed_in = false
+    end
 
     client = Instagram.client(:access_token => session[:access_token])
     users = client.user_search(@username)

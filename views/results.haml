@@ -6,11 +6,12 @@
         %nav.navbar
             .container-fluid
                 .navbar-header.navbar-right
-                    //%a.btn.btn-default.auth{:href => '/oauth/connect'}Connect with Instagram
                     %form#user-search.navbar-form.navbar-right{ :action => '/search', :method => 'GET'}
                         %div.form-group
                             %input.form-control{ :type => "text", :placeholder => "Search", :name => 'username'}
                         %button.btn.btn-default{ :type => "submit"}Search by Username
+                        - if !@signed_in
+                            %a.btn.btn-success.auth{:href => '/oauth/connect'}Connect with Instagram
         #pageContent
             %div#users
                 %div.results-container.col-lg-12
@@ -39,4 +40,6 @@
                     %span.username
                     %span in order to view this user.
             .modal-footer
+                - if !@signed_in
+                    %a.btn.btn-default.auth{:href => '/oauth/connect'}Connect with Instagram
                 %button.btn.btn-default.close{:type => "button", 'data-dismiss' => "modal"}Close

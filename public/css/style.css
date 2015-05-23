@@ -14,13 +14,20 @@ body {
 
 }
 
-nav.navbar {
+#header-container {
     position: fixed;
+    width: 100%;
     top: 0;
+}
+
+nav.navbar {
     display: block;
     padding-top: 10px;
     margin-bottom: 0px;
-    width: 100%;
+}
+
+.modal-footer .btn {
+    padding: 8px 12px;
 }
 
 a.navbar-brand {
@@ -85,7 +92,7 @@ a.navbar-brand {
 
 /* User results */
 #pageContent {
-    margin-top: 52px;
+    margin-top: 80px;
 }
 
 .progress {
@@ -200,7 +207,8 @@ a.login.btn {
   -moz-transform: translatex(-450px);
   transform: translatex(-450px);
   transition: all 1s;
-  height: 200px;
+  height: 190px;
+  overflow: hidden;
   padding: 0;
   margin: 0;
   list-style: none;

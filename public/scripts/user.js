@@ -22,6 +22,9 @@ $(function(){
 
     Filterometry.PhotoList = Backbone.Collection.extend({
         model: Filterometry.Photo,
+        initialize: function() {
+            this.userId = this.getUserId();
+        },
         currentFilters: [],
         totalMedia: null,
         mediaFetched: null,
@@ -33,8 +36,16 @@ $(function(){
             Filterometry.Photos.lastId = lastId;
             this.mediaFetched += resp.models.length;
             this.updateProgressBar();
+            this.fetchScroll = false;
             if (lastId) {
                 Filterometry.Photos.fetchNewItems();
+            }
+        },
+        fetchOnScroll: function(ev) {
+            if ((window.innerHeight + window.scrollY) >=
+                    $('.photos').height()) {
+                this.fetchScroll = true;
+                this.fetchNewItems();
             }
         },
         updateProgressBar: function() {
@@ -87,6 +98,11 @@ $(function(){
                         $photos.css({'background-color': color});
                     }
                 }
+            },
+            centerVertically: function() {
+                var scrollTop = $(window).scrollTop(),
+                    elementOffset = $('#chart').offset().top,
+                    distance = (elementOffset - scrollTop);
             }
         },
         getUserId: function() {
@@ -96,17 +112,20 @@ $(function(){
         },
         fetchNewItems: function () {
             var that = this;
-            var id = this.getUserId();
+            var id = this.userId;
             this.fetch({data: {'id': id, 'max_id': this.lastId || null},
                         add: true,
                         success: function(resp) {
-                            that.fetchNextSet(resp);
+                            if (that.mediaFetched < 500 || that.fetchScroll) {
+                                that.fetchNextSet(resp);
+                            }
                             console.log(resp);
                             }
                         }).
                     then(function() {
                         that.pieChart.chart = createPieChart(chartSeries);
                         that.pieChart.syncColors();
+                        that.pieChart.centerVertically();
                     });
         },
 
@@ -181,6 +200,9 @@ $(function(){
                 }).then(function() {
                     Filterometry.Photos.fetchNewItems();
                 });
+            $(window).bind('scroll', function(ev) {
+                Filterometry.Photos.fetchOnScroll(ev);
+            });
         },
 
         events: {
