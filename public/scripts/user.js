@@ -42,8 +42,8 @@ $(function(){
             }
         },
         fetchOnScroll: function(ev) {
-            if ((window.innerHeight + window.scrollY) >=
-                    $('.photos').height()) {
+            if (this.percentDone < 1 && ((window.innerHeight + window.scrollY) >=
+                    $('.photos').height())) {
                 this.fetchScroll = true;
                 this.fetchNewItems();
             }
