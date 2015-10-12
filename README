@@ -1,1 +1,5 @@
 View Instagram users' media aggregated by filter. Ruby/Sinatra API with Backbone frontend.
+
+Setup:
+-Using 'dotenv' plugin for configuration. Your .env file will need an Instagram developer API callback URL, client ID, and client secret.
+-Install Ruby and run 'bundle install' in the directory, and run the app with "rerun 'ruby app.rb'".
