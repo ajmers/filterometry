@@ -5,17 +5,15 @@ var Filterometry = (function() {
 
     var selectors = {
         photoElements: 'div.photo'
-        }
+    };
 
-    function privateMethod() {
-    }
 
     methods.getHideElements = function(classnames) {
-         var selector = selectors.photoElements + ':not(' + classnames.join(',') + ')';
-         return $(selector);
-    }
+        var selector = selectors.photoElements + ':not(' + classnames.join(',') + ')';
+        return $(selector);
+    };
 
-    methods.stripFilterName = function (filter) {
+    methods.stripFilterName = function(filter) {
         return filter.replace(/[^A-Z0-9]/ig, '_');
     };
 

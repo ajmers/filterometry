@@ -59,7 +59,13 @@ $(function() {
             var view = new Filterometry.PhotoView({model: photo});
             this.$('ul').append(view.render().el);
         }
+    }, {
+        el:$('#searchIn'),
+        initialize: function() {
+            console.log('Hello, world');
+            debugger;
+        }
     });
 
-    Filterometry.App = new Filterometry.AppView;
+    Filterometry.App = new Filterometry.AppView();
 });
