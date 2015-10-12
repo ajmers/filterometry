@@ -7,14 +7,14 @@
             %nav.navbar
                 .container-fluid
                     .navbar-header.navbar-right
-                        %form#user-search.navbar-form.navbar-right{ :action => '/search', :method => 'GET'}
-                            %div.form-group
-                                %input.form-control{ :type => "text", :placeholder => "Search", :name => 'username'}
-                            %button.btn.btn-default{ :type => "submit"}Search by Username
-                            - if !@signed_in
-                                %a.btn.btn-success.auth{:href => '/oauth/connect'}Connect with Instagram
-
-
+                        = haml :newSearch
+                        //%form#user-search.navbar-form.navbar-right{ :action => '/search', :method => 'GET' }
+                        //    %div.form-group
+                        //        %input.form-control{ :type => "text", :placeholder => "Search", :name => 'username' }
+                        //    %button.user-search.search-btn.btn.btn-default{ :type => "submit" }
+                        //    %button.tag-search.search-btn.btn.btn-default{ :type => "submit" }
+                        //    - if !@signed_in
+                        //        %a.btn.btn-success.auth{:href => '/oauth/connect'}Connect with Instagram
             %div.content
                 %div.title
                     %div.title-left
@@ -28,7 +28,7 @@
         #film
             %ul{:style => 'width: 3200px;'}
 
-%script{'defer' => true, 'src' => '../scripts/filmstrip.js'}
+%script{'defer' => true, 'src' => '../scripts/landing.js'}
 
 %script#filmstrip-template{"type" => "text/template"}
     %a

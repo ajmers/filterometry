@@ -11,7 +11,6 @@ body {
 #splash div.content {
     position: relative;
     margin: 0 auto;
-
 }
 
 #header-container {
@@ -36,6 +35,32 @@ a.navbar-brand {
     font-family: 'Syncopate', sans-serif;
     text-transform: uppercase;
     font-weight: 700;
+}
+.search-btn {
+    border: 0px;
+    width: 36px;
+    background-color: cadetblue;
+    height: 36px;
+    background-size: 30px;
+    background-position: center;
+}
+
+.search-btn:hover {
+    background-color:cadetblue;
+}
+
+.tag-search {
+    background-image: url(/hashtag-480.png);
+}
+.tag-search:hover {
+    background-image: url(/hashtag-480.png);
+}
+
+.user-search {
+    background-image: url(/user-256x256.png);
+}
+.user-search:hover {
+    background-image: url(/user-256x256.png);
 }
 
 #splash .btn-default.auth {

@@ -19,7 +19,7 @@ $(function(){
         url: '/api/users'
     });
 
-    Filterometry.Users = new Filterometry.UserList;
+    Filterometry.Users = new Filterometry.UserList();
 
     Filterometry.NoAuthView = Backbone.View.extend({
         tagName: 'div',
@@ -72,7 +72,7 @@ $(function(){
         setContent: function() {
             this.$('a.user-result').attr('href', 'user/' + this.model.get('id'));
             this.$('span.username').html(this.model.get('username'));
-            this.$('img.user-image').attr('src', this.model.get('profile_picture'))
+            this.$('img.user-image').attr('src', this.model.get('profile_picture'));
         },
         checkUserProfile: function(ev) {
             ev.preventDefault();
@@ -111,7 +111,7 @@ $(function(){
 
         getQueryUsername: function() {
             var queryParams = $.getQueryParameters();
-            for (key in queryParams) {
+            for (var key in queryParams) {
                 if (queryParams.hasOwnProperty(key) && key !== 'username') {
                     delete queryParams[key];
                 }
@@ -119,7 +119,13 @@ $(function(){
             return queryParams;
         },
         events: {
-            "submit form#user-search" : "fetchNewItems"
+            "click button.user-search": "fetchUsers",
+            "click button.tag-search": "fetchTags"
+            //"submit form#user-search" : "fetchNewItems"
+        },
+
+        fetchUsers: function (ev) {
+
         },
 
         fetchNewItems: function(ev) {
@@ -154,13 +160,15 @@ $(function(){
             });
         }
     });
-    $(function() {
+    $(function () {
         jQuery.extend({
 
-            getQueryParameters : function(str) {
-	            return (str || document.location.search).replace(/(^\?)/,'').split("&").map(function(n){return n = n.split("="),this[n[0]] = n[1],this}.bind({}))[0];
+            getQueryParameters: function (str) {
+	            return (str || document.location.search).replace(/(^\?)/,'').split("&").map(function (n){
+                    return n = n.split("="),this[n[0]] = n[1],this;
+                }.bind({}))[0];
             }
         });
-        Filterometry.App = new Filterometry.AppView;
+        Filterometry.App = new Filterometry.AppView();
     });
 });

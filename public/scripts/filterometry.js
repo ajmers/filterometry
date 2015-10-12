@@ -7,9 +7,6 @@ var Filterometry = (function() {
         photoElements: 'div.photo'
         }
 
-    function privateMethod() {
-    }
-
     methods.getHideElements = function(classnames) {
          var selector = selectors.photoElements + ':not(' + classnames.join(',') + ')';
          return $(selector);

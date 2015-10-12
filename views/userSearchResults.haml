@@ -9,7 +9,8 @@
                     %form#user-search.navbar-form.navbar-right{ :action => '/search', :method => 'GET'}
                         %div.form-group
                             %input.form-control{ :type => "text", :placeholder => "Search", :name => 'username'}
-                        %button.btn.btn-default{ :type => "submit"}Search by Username
+                        %button.user-search.search-btn.btn.btn-default{ :type => "submit"}
+                        %button.tag-search.search-btn.btn.btn-default{ :type => "submit" }
                         - if !@signed_in
                             %a.btn.btn-success.auth{:href => '/oauth/connect'}Connect with Instagram
         #pageContent
