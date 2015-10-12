@@ -47,7 +47,7 @@ $(function() {
         }
     });
 
-    Filterometry.AppView = Backbone.View.extend({
+    Filterometry.FilmView = Backbone.View.extend({
         el: $('#film'),
         initialize: function() {
             Filterometry.Photos.bind('add', this.addOne, this);
@@ -61,5 +61,5 @@ $(function() {
         }
     });
 
-    Filterometry.App = new Filterometry.AppView;
+    Filterometry.Filmstrip = new Filterometry.AppView();
 });
