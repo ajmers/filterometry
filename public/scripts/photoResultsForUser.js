@@ -9,7 +9,6 @@ $(function(){
     Filterometry.User = Backbone.Model.extend({
         idAttribute: "id",
         initialize: function() {
-            var that = this;
             this.id = this.setUserId();
             this.url = '/api/user/' + this.id;
         },
@@ -84,7 +83,6 @@ $(function(){
         },
         pieChart: {
             syncColors: function() {
-                var that = this;
                 var series = this.chart.series;
                 for (var i = 0, len = series.length; i < len; i++) {
                     var seriesi = series[i];
@@ -132,7 +130,7 @@ $(function(){
         url: '/api/photos'
     });
 
-    Filterometry.Photos = new Filterometry.PhotoList;
+    Filterometry.Photos = new Filterometry.PhotoList();
 
     Filterometry.PhotoView = Backbone.View.extend({
         tagName: 'div',
@@ -192,10 +190,10 @@ $(function(){
         initialize: function() {
             Filterometry.Photos.bind('add', this.addOne, this);
             Filterometry.Photos.bind('all', this.render, this);
-            Filterometry.SearchedUser = new Filterometry.User;
+            Filterometry.SearchedUser = new Filterometry.User();
             Filterometry.SearchedUser.fetch({success: function(resp) {
                     this.username = resp.get('username');
-                    Filterometry.Photos.totalMedia = resp.get('counts')['media'];
+                    Filterometry.Photos.totalMedia = resp.get('counts').media;
                     }
                 }).then(function() {
                     Filterometry.Photos.fetchNewItems();
@@ -222,7 +220,7 @@ $(function(){
         }
     });
 
-        Filterometry.App = new Filterometry.AppView;
+        Filterometry.App = new Filterometry.AppView();
 
     Filterometry.generalChartsConfig = {
         chart: {
@@ -232,7 +230,7 @@ $(function(){
                     var selected = this.getSelectedPoints();
                     $.each(selected, function(i, p) {
                         p.select(false);
-                    })
+                    });
                     Filterometry.Photos.clearFilter();
                 }
             },
@@ -257,11 +255,11 @@ $(function(){
                 }
             }
         }
-    }
+    };
 
     function createPieChart(data) {
         function getPieData(data) {
-            var series = []
+            var series = [];
             for (var key in data) {
                 if (data.hasOwnProperty(key)) {
                     var point = [key, data[key]];
@@ -328,7 +326,7 @@ $(function(){
             series: barChartData
         };
         var barConfig = jQuery.extend(true, barOptions,
-                Filterometry.generalChartsConfig)
+                Filterometry.generalChartsConfig);
         var barChart = new Highcharts.Chart(barConfig);
     }
 
