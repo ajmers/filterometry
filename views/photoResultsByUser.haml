@@ -8,12 +8,7 @@
             %nav.navbar.navbar-default
                 .container-fluid
                     %a.navbar-brand{:href => "#"} Filterometry
-                    .navbar-header.navbar-right
-                        %form#user-search.navbar-form.navbar-right{ :action => '/search', :method => 'GET'}
-                            %div.form-group
-                                %input.form-control{ :type => "text", :placeholder => "Search", :name => 'username'}
-                            %button.user-search.search-btn.btn.btn-default{ :type => "submit" }
-                            %button.tag-search.search-btn.btn.btn-default{ :type => "submit" }
+                    = haml :newSearch
 
             #progressbar
                 .progress.progress-striped.active
