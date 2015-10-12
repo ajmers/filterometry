@@ -7,7 +7,8 @@
             %div.top-nav
                 %div.col-lg-3
                     %a.btn.btn-default{:href => '/oauth/connect'}Connect with Instagram
-                    %a.btn.btn-default{:href => '/search'}Search by username
+                    %a.user-search.search-btn.btn.btn-default{:href => '/user-search'}
+                    %a.tag-search.search-btn.btn.btn-default{:href => '/tag-search'}
 
             %div.content
                 %div.title
@@ -19,7 +20,7 @@
         #film
             %ul{:style => 'width: 3200px;'}
 
-%script{'defer' => true, 'src' => '../scripts/filmstrip.js'}
+%script{'defer' => true, 'src' => '../scripts/landing.js'}
 
 %script#filmstrip-template{"type" => "text/template"}
     %a
