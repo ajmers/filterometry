@@ -98,6 +98,25 @@ get '/api/users' do
     return @users.to_json
 end
 
+get '/api/tag/:tagname' do
+    tag = params[:tagname]
+
+    client = Instagram.client(:access_token => session[:access_token])
+    photos = client.tag_recent_media(tag)
+
+    return photos.to_json
+end
+
+get '/api/tags/:tagname' do
+    @tag = params[:tagname]
+
+    client = Instagram.client(:access_token => session[:access_token])
+    @tags = client.tag_search(@tag)
+    puts @tags
+
+    return @tags.to_json
+end
+
 get '/api/photos' do
     id = params[:id]
     puts id
