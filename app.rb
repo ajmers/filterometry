@@ -107,7 +107,7 @@ get '/api/tag/:tagname' do
     return photos.to_json
 end
 
-get '/api/tags/tagname' do
+get '/api/tags/:tagname' do
     @tag = params[:tagname]
 
     client = Instagram.client(:access_token => session[:access_token])
