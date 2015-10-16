@@ -48,7 +48,7 @@ get "/search" do
     end
     puts @signed_in
 
-    haml :userSearchResults
+    haml :searchResultsList
 end
 
 post "/search" do
@@ -65,15 +65,15 @@ post "/search" do
         @signed_in = false
     end
 
-    haml :userSearchResults
+    haml :searchResultsList
 end
 
 get "/user/:id" do
-    haml :photoResultsByUser
+    haml :photoResultsForSearch
 end
 
 get "/tag/:name" do
-    haml :photoResultsByUser
+    haml :photoResultsForSearch
 end
 
 Instagram.configure do |config|
@@ -107,14 +107,17 @@ get '/api/users' do
     return @users.to_json
 end
 
-get '/api/tag' do
-    puts 'tag endpoint'
-    tag = params[:tag]
+get '/api/tag/:name' do
+    name = params[:name]
 
-    client = Instagram.client(:access_token => session[:access_token])
-    photos = client.tag_recent_media(tag)
+    begin
+        tag = Instagram.tag(name)
+    rescue Instagram::BadRequest
+        status 400
+        return {:error => '400'}.to_json
+    end
 
-    return photos.to_json
+    tag.to_json
 end
 
 get '/api/tags' do
