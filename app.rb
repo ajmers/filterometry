@@ -33,6 +33,10 @@ get "/oauth/callback" do
 end
 
 get "/search" do
+    puts params
+    @searchType = if params[:username] then :user else :tag end
+    @searchTerm = if params[:username] then params[:username] else params[:tag] end
+
     REDIRECT_URL = "/search"
     puts session[:access_token]
     if !session[:access_token].nil?
@@ -44,13 +48,16 @@ get "/search" do
     end
     puts @signed_in
 
-    haml :UserSearchResults
+    haml :userSearchResults
 end
 
 post "/search" do
     REDIRECT_URL = "/search"
-    @username = params[:username]
-    puts @username
+
+    puts params
+    @searchType = if params[:username] then :user else :tag end
+    @searchTerm = if params[:username] then params[:username] else params[:tag] end
+
     if !session[:access_token].nil?
         puts session[:access_token]
         @signed_in = true
@@ -96,8 +103,9 @@ get '/api/users' do
     return @users.to_json
 end
 
-get '/api/tag/:tagname' do
-    tag = params[:tagname]
+get '/api/tag' do
+    puts 'tag endpoint'
+    tag = params[:tag]
 
     client = Instagram.client(:access_token => session[:access_token])
     photos = client.tag_recent_media(tag)
@@ -105,8 +113,10 @@ get '/api/tag/:tagname' do
     return photos.to_json
 end
 
-get '/api/tags/:tagname' do
-    @tag = params[:tagname]
+get '/api/tags' do
+    puts 'tags endpoint'
+    @tag = params[:tag]
+    puts @tag
 
     client = Instagram.client(:access_token => session[:access_token])
     @tags = client.tag_search(@tag)

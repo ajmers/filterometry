@@ -15,7 +15,11 @@
                             %a.btn.btn-success.auth{:href => '/oauth/connect'}Connect with Instagram
         #pageContent
             %div#users
-                %div.results-container.col-lg-12
+                %div.user-results-container.col-lg-12
+                    %h1.results-header
+                    %div.results
+            %div#tags
+                %div.tag-results-container.col-lg-12
                     %h1.results-header
                     %div.results
 
@@ -28,6 +32,11 @@
 
         %div.user-image-container
             %img.user-image
+
+%script#tag-template{"type" => "text/template"}
+    %a.tag-result
+        %span.tag
+        %span.tagCount
 
 %script#modal-template{"type" => "text/template"}
     .modal-dialog
