@@ -72,6 +72,10 @@ get "/user/:id" do
     haml :photoResultsByUser
 end
 
+get "/tag/:name" do
+    haml :photoResultsByUser
+end
+
 Instagram.configure do |config|
   config.client_id = ENV["CLIENT_ID"]
   config.client_secret = ENV["CLIENT_SECRET"]
@@ -123,6 +127,19 @@ get '/api/tags' do
     puts @tags
 
     return @tags.to_json
+end
+
+get '/api/tagPhotos' do
+    name = params[:id]
+    puts name
+
+    begin
+        response = Instagram.tag_recent_media(name, {:access_token => session[:access_token], :max_id => params[:max_id]})
+    rescue Instagram::BadRequest
+        status 400
+        return {:error => '400'}.to_json
+    end
+    response.to_json
 end
 
 get '/api/photos' do

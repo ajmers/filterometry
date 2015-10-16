@@ -8,21 +8,26 @@ $(function(){
 
     Filterometry.User = Backbone.Model.extend({
         idAttribute: "id",
-        initialize: function() {
-            this.id = this.setUserId();
+        initialize: function(options) {
+            this.id = options.id;
             this.url = '/api/user/' + this.id;
-        },
-        setUserId: function() {
-            var url = document.location.pathname;
-            var id = /\/user\/(\d+)/.exec(url)[1];
-            return id;
         }
+    });
+
+    Filterometry.Tag = Backbone.Model.extend({
+        idAttribute: "name",
+        initialize: function(options) {
+            this.name = options.name;
+            this.url = '/api/tag/' + this.name;
+        },
     });
 
     Filterometry.PhotoList = Backbone.Collection.extend({
         model: Filterometry.Photo,
-        initialize: function() {
-            this.userId = this.getUserId();
+        initialize: function (options) {
+            this.type = options.type;
+            this.idAttribute = options.userId || options.tagName;
+            this.baseUrl = options.url;
         },
         currentFilters: [],
         totalMedia: null,
@@ -103,14 +108,9 @@ $(function(){
                     distance = (elementOffset - scrollTop);
             }
         },
-        getUserId: function() {
-            var url = document.location.pathname;
-            var id = /\/user\/(\d+)/.exec(url)[1];
-            return id;
-        },
         fetchNewItems: function () {
             var that = this;
-            var id = this.userId;
+            var id = this.idAttribute;
             this.fetch({data: {'id': id, 'max_id': this.lastId || null},
                         add: true,
                         success: function(resp) {
@@ -127,10 +127,10 @@ $(function(){
                     });
         },
 
-        url: '/api/photos'
+        url: function () {
+            return this.baseUrl;
+        }
     });
-
-    Filterometry.Photos = new Filterometry.PhotoList();
 
     Filterometry.PhotoView = Backbone.View.extend({
         tagName: 'div',
@@ -187,20 +187,52 @@ $(function(){
 
     Filterometry.AppView = Backbone.View.extend({
         el: $('#photos'),
+        userRegex: /^\/user\//,
         initialize: function() {
+            var searchType = this.userRegex.test(document.location.pathname) ?
+                    'user' : 'tag';
+            if (searchType === 'user') {
+                this.userId = this.getUserId();
+                Filterometry.Photos = new Filterometry.PhotoList({
+                    userId: this.userId,
+                    type: searchType,
+                    url: '/api/photos'
+                });
+                Filterometry.SearchedUser = new Filterometry.User({id: this.userId});
+                Filterometry.SearchedUser.fetch({success: function(resp) {
+                        this.username = resp.get('username');
+                        Filterometry.Photos.totalMedia = resp.get('counts').media;
+                        }
+                    }).then(function() {
+                        Filterometry.Photos.fetchNewItems();
+                    });
+            } else {
+                this.tagName = this.getTagName();
+                Filterometry.Photos = new Filterometry.PhotoList({
+                    type: searchType,
+                    url: '/api/tagPhotos',
+                    tagName: this.tagName
+                });
+                Filterometry.SearchedTag = new Filterometry.Tag({name: this.tagName});
+                Filterometry.Photos.fetchNewItems();
+            }
+
             Filterometry.Photos.bind('add', this.addOne, this);
             Filterometry.Photos.bind('all', this.render, this);
-            Filterometry.SearchedUser = new Filterometry.User();
-            Filterometry.SearchedUser.fetch({success: function(resp) {
-                    this.username = resp.get('username');
-                    Filterometry.Photos.totalMedia = resp.get('counts').media;
-                    }
-                }).then(function() {
-                    Filterometry.Photos.fetchNewItems();
-                });
+
             $(window).bind('scroll', function(ev) {
                 Filterometry.Photos.fetchOnScroll(ev);
             });
+        },
+        getTagName: function () {
+            var url = document.location.pathname;
+            var name = /\/tag\/([A-z]+)/.exec(url)[1];
+            return name;
+        },
+        getUserId: function() {
+            var url = document.location.pathname;
+            var id = /\/user\/(\d+)/.exec(url)[1];
+            return id;
         },
 
         events: {
