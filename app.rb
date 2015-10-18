@@ -33,6 +33,10 @@ get "/oauth/callback" do
 end
 
 get "/search" do
+    puts params
+    @searchType = if params[:username] then :user else :tag end
+    @searchTerm = if params[:username] then params[:username] else params[:tag] end
+
     REDIRECT_URL = "/search"
     puts session[:access_token]
     if !session[:access_token].nil?
@@ -44,13 +48,16 @@ get "/search" do
     end
     puts @signed_in
 
-    haml :results
+    haml :searchResultsList
 end
 
 post "/search" do
     REDIRECT_URL = "/search"
-    @username = params[:username]
-    puts @username
+
+    puts params
+    @searchType = if params[:username] then :user else :tag end
+    @searchTerm = if params[:username] then params[:username] else params[:tag] end
+
     if !session[:access_token].nil?
         puts session[:access_token]
         @signed_in = true
@@ -58,13 +65,15 @@ post "/search" do
         @signed_in = false
     end
 
-    client = Instagram.client(:access_token => session[:access_token])
-    users = client.user_search(@username)
-    haml :results
+    haml :searchResultsList
 end
 
 get "/user/:id" do
-    haml :user
+    haml :photoResultsForSearch
+end
+
+get "/tag/:name" do
+    haml :photoResultsForSearch
 end
 
 Instagram.configure do |config|
@@ -98,17 +107,23 @@ get '/api/users' do
     return @users.to_json
 end
 
-get '/api/tag/:tagname' do
-    tag = params[:tagname]
+get '/api/tag/:name' do
+    name = params[:name]
 
-    client = Instagram.client(:access_token => session[:access_token])
-    photos = client.tag_recent_media(tag)
+    begin
+        tag = Instagram.tag(name)
+    rescue Instagram::BadRequest
+        status 400
+        return {:error => '400'}.to_json
+    end
 
-    return photos.to_json
+    tag.to_json
 end
 
-get '/api/tags/:tagname' do
-    @tag = params[:tagname]
+get '/api/tags' do
+    puts 'tags endpoint'
+    @tag = params[:tag]
+    puts @tag
 
     client = Instagram.client(:access_token => session[:access_token])
     @tags = client.tag_search(@tag)
@@ -117,12 +132,27 @@ get '/api/tags/:tagname' do
     return @tags.to_json
 end
 
+get '/api/tagPhotos' do
+    name = params[:id]
+    client = Instagram.client(:access_token => session[:access_token], :no_response_wrapper => true)
+    begin
+        response = client.tag_recent_media(name, {:access_token => session[:access_token], :max_tag_id => params[:max_id]})
+    rescue Instagram::BadRequest
+        status 400
+        return {:error => '400'}.to_json
+    end
+
+    response.to_json
+end
+
 get '/api/photos' do
     id = params[:id]
     puts id
 
+    client = Instagram.client(:access_token => session[:access_token], :no_response_wrapper => true)
+
     begin
-        response = Instagram.user_recent_media(id, {:access_token => session[:access_token], :max_id => params[:max_id]})
+        response = client.user_recent_media(id, {:access_token => session[:access_token], :max_id => params[:max_id]})
     rescue Instagram::BadRequest
         status 400
         return {:error => '400'}.to_json

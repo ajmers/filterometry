@@ -1,4 +1,4 @@
-$(function(){
+$(function (){
 
     var chartSeries = {};
 
@@ -8,71 +8,85 @@ $(function(){
 
     Filterometry.User = Backbone.Model.extend({
         idAttribute: "id",
-        initialize: function() {
-            this.id = this.setUserId();
+        initialize: function (options) {
+            this.id = options.id;
             this.url = '/api/user/' + this.id;
-        },
-        setUserId: function() {
-            var url = document.location.pathname;
-            var id = /\/user\/(\d+)/.exec(url)[1];
-            return id;
         }
+    });
+
+    Filterometry.Tag = Backbone.Model.extend({
+        idAttribute: "name",
+        initialize: function (options) {
+            this.name = options.name;
+            this.url = '/api/tag/' + this.name;
+        },
     });
 
     Filterometry.PhotoList = Backbone.Collection.extend({
         model: Filterometry.Photo,
-        initialize: function() {
-            this.userId = this.getUserId();
+        initialize: function (options) {
+            this.type = options.type;
+            this.idAttribute = options.userId || options.tagName;
+            this.baseUrl = options.url;
         },
         currentFilters: [],
-        totalMedia: null,
-        mediaFetched: null,
-        percentDone: null,
+        totalMedia: 0,
+        mediaFetched: 0,
+        percentDone: 0,
         lastId: 0,
-        fetchNextSet: function(resp) {
-            var lastPhoto = resp && resp.models && resp.models[resp.models.length - 1];
-            var lastId = lastPhoto && lastPhoto.get('id');
-            Filterometry.Photos.lastId = lastId;
-            this.mediaFetched += resp.models.length;
+        parse: function (resp) {
+            console.log('parsing');
+            this.next_max_id = resp.pagination.next_max_tag_id;
+            return resp.data;
+        },
+        fetchNextSet: function (resp) {
+            console.log('fetchNextSet');
+            if (!this.next_max_tag_id) {
+                var oldestPhoto = resp && resp.models && resp.models[resp.models.length - 1];
+                var lastId = oldestPhoto.get('id');
+                Filterometry.Photos.lastId = lastId;
+            } else {
+                this.lastId = this.next_max_id;
+            }
+
             this.updateProgressBar();
             this.fetchScroll = false;
-            if (lastId) {
-                Filterometry.Photos.fetchNewItems();
-            }
+            Filterometry.Photos.fetchNewItems();
         },
-        fetchOnScroll: function(ev) {
-            if (this.percentDone < 1 && ((window.innerHeight + window.scrollY) >=
-                    $('.photos').height())) {
-                this.fetchScroll = true;
-                this.fetchNewItems();
-            }
-        },
-        updateProgressBar: function() {
+        //fetchOnScroll: function (ev) {
+        //    if (!this.fetchScroll && this.percentDone < 1 && ((window.innerHeight + window.scrollY) >=
+        //            $('.photos').height())) {
+        //        this.fetchScroll = true;
+        //        console.log('scroll fetch');
+        //        this.fetchNewItems();
+        //    }
+        //},
+        updateProgressBar: function () {
             this.percentDone = this.mediaFetched / this.totalMedia;
             var $progressBar = $('.progress-bar');
             var percentage = this.percentDone * 100 + '%';
             $progressBar.width(percentage);
             if (this.percentDone === 1) {
-                setTimeout(function() {
+                setTimeout(function () {
                     $('.progress').fadeTo(1000, 0);
                 }, 1000);
             }
         },
-        clearFilter: function() {
+        clearFilter: function () {
             $('div.photo').fadeIn();
         },
-        filterByFilter: function(filter, accumulate) {
+        filterByFilter: function (filter, accumulate) {
             var sfn = Filterometry.stripFilterName;
             var filterStr = sfn(filter);
 
             var alreadySelected = accumulate ? this.pieChart.chart.getSelectedPoints() : [];
-            var alreadySelectedFilters = $.map(alreadySelected, function(point, i) {
+            var alreadySelectedFilters = $.map(alreadySelected, function (point, i) {
                 return sfn(point.name);
             });
 
             alreadySelectedFilters.push(filterStr);
 
-            var classnames = $.map(alreadySelectedFilters, function(point, i) {
+            var classnames = $.map(alreadySelectedFilters, function (point, i) {
                 return '.' + point;
             });
             $toShow = $(classnames.join(','));
@@ -82,7 +96,7 @@ $(function(){
             photosToHide.fadeOut();
         },
         pieChart: {
-            syncColors: function() {
+            syncColors: function () {
                 var series = this.chart.series;
                 for (var i = 0, len = series.length; i < len; i++) {
                     var seriesi = series[i];
@@ -97,46 +111,42 @@ $(function(){
                     }
                 }
             },
-            centerVertically: function() {
+            centerVertically: function () {
                 var scrollTop = $(window).scrollTop(),
                     elementOffset = $('#chart').offset().top,
                     distance = (elementOffset - scrollTop);
             }
         },
-        getUserId: function() {
-            var url = document.location.pathname;
-            var id = /\/user\/(\d+)/.exec(url)[1];
-            return id;
-        },
         fetchNewItems: function () {
-            var that = this;
-            var id = this.userId;
+            var id = this.idAttribute;
+            console.log('fetching NEW items');
             this.fetch({data: {'id': id, 'max_id': this.lastId || null},
                         add: true,
-                        success: function(resp) {
-                            if (that.mediaFetched < 500 || that.fetchScroll) {
-                                that.fetchNextSet(resp);
+                        success: function (resp) {
+                            this.mediaFetched += resp.models.length;
+                            if (this.mediaFetched < 500 || this.fetchScroll) {
+                                this.fetchNextSet(resp);
                             }
                             console.log(resp);
-                            }
-                        }).
-                    then(function() {
-                        that.pieChart.chart = createPieChart(chartSeries);
-                        that.pieChart.syncColors();
-                        that.pieChart.centerVertically();
-                    });
+                        }.bind(this)
+                    }).
+                    then(function () {
+                        this.pieChart.chart = createPieChart(chartSeries);
+                        this.pieChart.syncColors();
+                        this.pieChart.centerVertically();
+                    }.bind(this));
         },
 
-        url: '/api/photos'
+        url: function () {
+            return this.baseUrl;
+        }
     });
-
-    Filterometry.Photos = new Filterometry.PhotoList();
 
     Filterometry.PhotoView = Backbone.View.extend({
         tagName: 'div',
         className: 'photo',
         template: _.template($('#photo-template').html()),
-        initialize: function() {
+        initialize: function () {
             this.model.bind('change', this.render, this);
             this.model.bind('destroy', this.remove, this);
             this.addFilterData(this.model);
@@ -145,14 +155,14 @@ $(function(){
             'mouseenter img': 'focus',
             'mouseout img': 'blur'
         },
-        focus: function() {
+        focus: function () {
             console.log('mouseover');
             this.$('img').addClass('focused');
         },
-        blur: function() {
+        blur: function () {
 
         },
-        addFilterData: function(photo) {
+        addFilterData: function (photo) {
             var filter = photo.get('filter');
             if (chartSeries[filter]) {
                 chartSeries[filter]++;
@@ -161,17 +171,17 @@ $(function(){
             }
         },
 
-        render: function() {
+        render: function () {
             $(this.el).html(this.template(this.model.toJSON()));
             this.setContent();
             return this;
         },
 
-        remove: function() {
+        remove: function () {
             $(this.el).remove();
         },
 
-        setContent: function() {
+        setContent: function () {
             var filter = this.model.get('filter');
             this.$('.filter').html(filter);
             this.$('img').attr('src',
@@ -179,7 +189,7 @@ $(function(){
             this.$el.addClass(Filterometry.stripFilterName(filter));
         },
 
-        clear: function() {
+        clear: function () {
             this.model.destroy();
         }
     });
@@ -187,35 +197,72 @@ $(function(){
 
     Filterometry.AppView = Backbone.View.extend({
         el: $('#photos'),
-        initialize: function() {
+        userRegex: /^\/user\//,
+        initialize: function () {
+            var searchType = this.userRegex.test(document.location.pathname) ?
+                    'user' : 'tag';
+            if (searchType === 'user') {
+                this.userId = this.getUserId();
+                Filterometry.Photos = new Filterometry.PhotoList({
+                    userId: this.userId,
+                    type: searchType,
+                    url: '/api/photos'
+                });
+                Filterometry.SearchedUser = new Filterometry.User({id: this.userId});
+                Filterometry.SearchedUser.fetch({success: function (resp) {
+                        this.username = resp.get('username');
+                        Filterometry.Photos.totalMedia = resp.get('counts').media;
+                        }
+                    }).then(function () {
+                        Filterometry.Photos.fetchNewItems();
+                    });
+            } else {
+                this.tagName = this.getTagName();
+                Filterometry.Photos = new Filterometry.PhotoList({
+                    type: searchType,
+                    url: '/api/tagPhotos',
+                    tagName: this.tagName
+                });
+                Filterometry.SearchedTag = new Filterometry.Tag({name: this.tagName});
+                Filterometry.SearchedTag.fetch({success: function (resp) {
+                        Filterometry.Photos.totalMedia = resp.get('media_count');
+                        }
+                    }).then(function () {
+                        Filterometry.Photos.fetchNewItems();
+                    });
+            }
+
             Filterometry.Photos.bind('add', this.addOne, this);
             Filterometry.Photos.bind('all', this.render, this);
-            Filterometry.SearchedUser = new Filterometry.User();
-            Filterometry.SearchedUser.fetch({success: function(resp) {
-                    this.username = resp.get('username');
-                    Filterometry.Photos.totalMedia = resp.get('counts').media;
-                    }
-                }).then(function() {
-                    Filterometry.Photos.fetchNewItems();
-                });
-            $(window).bind('scroll', function(ev) {
-                Filterometry.Photos.fetchOnScroll(ev);
-            });
+
+            //$(window).bind('scroll', function (ev) {
+            //    Filterometry.Photos.fetchOnScroll(ev);
+            //});
+        },
+        getTagName: function () {
+            var url = document.location.pathname;
+            var name = /\/tag\/([A-z]+)/.exec(url)[1];
+            return name;
+        },
+        getUserId: function () {
+            var url = document.location.pathname;
+            var id = /\/user\/(\d+)/.exec(url)[1];
+            return id;
         },
 
         events: {
         },
 
-        fetchNewItems: function(ev) {
+        fetchNewItems: function (ev) {
             Filterometry.Photos.fetchNewItems();
         },
 
-        addOne: function(photo) {
+        addOne: function (photo) {
             var view = new Filterometry.PhotoView({model: photo});
             this.$('div.photos').append(view.render().el);
         },
 
-        addAll: function() {
+        addAll: function () {
             Filterometry.Photos.each(this.addOne);
         }
     });
@@ -226,9 +273,9 @@ $(function(){
         chart: {
             backgroundColor: 'transparent',
             events: {
-                click: function() {
+                click: function () {
                     var selected = this.getSelectedPoints();
-                    $.each(selected, function(i, p) {
+                    $.each(selected, function (i, p) {
                         p.select(false);
                     });
                     Filterometry.Photos.clearFilter();

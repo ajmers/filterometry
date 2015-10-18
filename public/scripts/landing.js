@@ -20,7 +20,7 @@ $(function() {
 
     });
 
-    Filterometry.Photos = new Filterometry.PhotoStrip;
+    Filterometry.Photos = new Filterometry.PhotoStrip();
 
     Filterometry.PhotoView = Backbone.View.extend({
         tagName: 'li',
@@ -61,5 +61,5 @@ $(function() {
         }
     });
 
-    Filterometry.App = new Filterometry.AppView;
+    Filterometry.App = new Filterometry.AppView();
 });

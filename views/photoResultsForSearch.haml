@@ -8,11 +8,7 @@
             %nav.navbar.navbar-default
                 .container-fluid
                     %a.navbar-brand{:href => "#"} Filterometry
-                    .navbar-header.navbar-right
-                        %form#user-search.navbar-form.navbar-right{ :action => '/search', :method => 'GET'}
-                            %div.form-group
-                                %input.form-control{ :type => "text", :placeholder => "Search", :name => 'username'}
-                            %button.btn.btn-default{ :type => "submit"}Search by Username
+                    = haml :newSearch
 
             #progressbar
                 .progress.progress-striped.active
@@ -25,7 +21,7 @@
 
 %script{'defer' => true, 'src' => '../scripts/highcharts.src.js'}
 %script{'defer' => true, 'src' => '../scripts/filterometry.js'}
-%script{'defer' => true, 'src' => '../scripts/photoResultsForUser.js'}
+%script{'defer' => true, 'src' => '../scripts/photoResultsForSearch.js'}
 %script#photo-template{"type" => "text/template"}
     %div.filter
     %div.image
