@@ -134,14 +134,14 @@ end
 
 get '/api/tagPhotos' do
     name = params[:id]
-    puts name
-
+    client = Instagram.client(:access_token => session[:access_token], :no_response_wrapper => true)
     begin
-        response = Instagram.tag_recent_media(name, {:access_token => session[:access_token], :max_id => params[:max_id]})
+        response = client.tag_recent_media(name, {:access_token => session[:access_token], :max_tag_id => params[:max_id]})
     rescue Instagram::BadRequest
         status 400
         return {:error => '400'}.to_json
     end
+
     response.to_json
 end
 
@@ -149,8 +149,10 @@ get '/api/photos' do
     id = params[:id]
     puts id
 
+    client = Instagram.client(:access_token => session[:access_token], :no_response_wrapper => true)
+
     begin
-        response = Instagram.user_recent_media(id, {:access_token => session[:access_token], :max_id => params[:max_id]})
+        response = client.user_recent_media(id, {:access_token => session[:access_token], :max_id => params[:max_id]})
     rescue Instagram::BadRequest
         status 400
         return {:error => '400'}.to_json

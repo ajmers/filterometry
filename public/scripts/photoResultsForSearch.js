@@ -30,32 +30,37 @@ $(function (){
             this.baseUrl = options.url;
         },
         currentFilters: [],
-        totalMedia: null,
-        mediaFetched: null,
-        percentDone: null,
+        totalMedia: 0,
+        mediaFetched: 0,
+        percentDone: 0,
         lastId: 0,
+        parse: function (resp) {
+            console.log('parsing');
+            this.next_max_id = resp.pagination.next_max_tag_id;
+            return resp.data;
+        },
         fetchNextSet: function (resp) {
             console.log('fetchNextSet');
-            var lastPhoto = resp && resp.models && resp.models[resp.models.length - 1];
-            var lastId = lastPhoto && lastPhoto.get('id');
-            if (Filterometry.Photos.lastId !== lastId) {
+            if (!this.next_max_tag_id) {
+                var oldestPhoto = resp && resp.models && resp.models[resp.models.length - 1];
+                var lastId = oldestPhoto.get('id');
                 Filterometry.Photos.lastId = lastId;
-                this.mediaFetched += resp.models.length;
-                this.updateProgressBar();
-                this.fetchScroll = false;
-                Filterometry.Photos.fetchNewItems();
             } else {
-                this.fetchScroll = false;
+                this.lastId = this.next_max_id;
             }
+
+            this.updateProgressBar();
+            this.fetchScroll = false;
+            Filterometry.Photos.fetchNewItems();
         },
-        fetchOnScroll: function (ev) {
-            if (!this.fetchScroll && this.percentDone < 1 && ((window.innerHeight + window.scrollY) >=
-                    $('.photos').height())) {
-                this.fetchScroll = true;
-                console.log('scroll fetch');
-                this.fetchNewItems();
-            }
-        },
+        //fetchOnScroll: function (ev) {
+        //    if (!this.fetchScroll && this.percentDone < 1 && ((window.innerHeight + window.scrollY) >=
+        //            $('.photos').height())) {
+        //        this.fetchScroll = true;
+        //        console.log('scroll fetch');
+        //        this.fetchNewItems();
+        //    }
+        //},
         updateProgressBar: function () {
             this.percentDone = this.mediaFetched / this.totalMedia;
             var $progressBar = $('.progress-bar');
@@ -118,6 +123,7 @@ $(function (){
             this.fetch({data: {'id': id, 'max_id': this.lastId || null},
                         add: true,
                         success: function (resp) {
+                            this.mediaFetched += resp.models.length;
                             if (this.mediaFetched < 500 || this.fetchScroll) {
                                 this.fetchNextSet(resp);
                             }
@@ -229,9 +235,9 @@ $(function (){
             Filterometry.Photos.bind('add', this.addOne, this);
             Filterometry.Photos.bind('all', this.render, this);
 
-            $(window).bind('scroll', function (ev) {
-                Filterometry.Photos.fetchOnScroll(ev);
-            });
+            //$(window).bind('scroll', function (ev) {
+            //    Filterometry.Photos.fetchOnScroll(ev);
+            //});
         },
         getTagName: function () {
             var url = document.location.pathname;
