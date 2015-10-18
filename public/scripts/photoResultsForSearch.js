@@ -41,16 +41,17 @@ $(function (){
         },
         fetchNextSet: function (resp) {
             console.log('fetchNextSet');
-            if (!this.next_max_tag_id) {
+            this.fetchScroll = false;
+            if (!this.next_max_id) {
                 var oldestPhoto = resp && resp.models && resp.models[resp.models.length - 1];
                 var lastId = oldestPhoto.get('id');
                 Filterometry.Photos.lastId = lastId;
-            } else {
+            } else if (this.next_max_id !== this.lastId) {
                 this.lastId = this.next_max_id;
+            } else {
+                return;
             }
 
-            this.updateProgressBar();
-            this.fetchScroll = false;
             Filterometry.Photos.fetchNewItems();
         },
         //fetchOnScroll: function (ev) {
@@ -124,10 +125,10 @@ $(function (){
                         add: true,
                         success: function (resp) {
                             this.mediaFetched += resp.models.length;
-                            if (this.mediaFetched < 500 || this.fetchScroll) {
+                            this.updateProgressBar();
+                            if (this.mediaFetched < 500) {
                                 this.fetchNextSet(resp);
                             }
-                            console.log(resp);
                         }.bind(this)
                     }).
                     then(function () {
