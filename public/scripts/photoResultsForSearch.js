@@ -54,14 +54,14 @@ $(function (){
 
             Filterometry.Photos.fetchNewItems();
         },
-        //fetchOnScroll: function (ev) {
-        //    if (!this.fetchScroll && this.percentDone < 1 && ((window.innerHeight + window.scrollY) >=
-        //            $('.photos').height())) {
-        //        this.fetchScroll = true;
-        //        console.log('scroll fetch');
-        //        this.fetchNewItems();
-        //    }
-        //},
+        fetchOnScroll: function (ev) {
+           if (!this.fetchScroll && this.percentDone < 1 && ((window.innerHeight + window.scrollY) >=
+                   $('.photos').height())) {
+               this.fetchScroll = true;
+               console.log('scroll fetch');
+               this.fetchNextSet();
+           }
+        },
         updateProgressBar: function () {
             this.percentDone = this.mediaFetched / this.totalMedia;
             var $progressBar = $('.progress-bar');
@@ -236,9 +236,9 @@ $(function (){
             Filterometry.Photos.bind('add', this.addOne, this);
             Filterometry.Photos.bind('all', this.render, this);
 
-            //$(window).bind('scroll', function (ev) {
-            //    Filterometry.Photos.fetchOnScroll(ev);
-            //});
+            $(window).bind('scroll', function (ev) {
+               Filterometry.Photos.fetchOnScroll(ev);
+            });
         },
         getTagName: function () {
             var url = document.location.pathname;
