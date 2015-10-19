@@ -44,8 +44,8 @@ $(function (){
             this.fetchScroll = false;
             if (!this.next_max_id) {
                 var oldestPhoto = resp && resp.models && resp.models[resp.models.length - 1];
-                var lastId = oldestPhoto.get('id');
-                Filterometry.Photos.lastId = lastId;
+                var lastId = oldestPhoto ? oldestPhoto.get('id') : this.lastId;
+                this.lastId = lastId;
             } else if (this.next_max_id !== this.lastId) {
                 this.lastId = this.next_max_id;
             } else {
