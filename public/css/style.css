@@ -208,6 +208,10 @@ img.thumbnail-image {
     padding: 3px;
 }
 
+.thumbnail {
+    margin: 1px;
+}
+
 /* Photo Details */
 
 .image-details {
