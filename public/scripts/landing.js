@@ -16,6 +16,10 @@ $(function() {
                         });
         },
 
+        parse: function (resp) {
+            return resp.data;
+        },
+
         url: '/api/photos'
 
     });
