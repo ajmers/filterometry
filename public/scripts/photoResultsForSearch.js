@@ -147,11 +147,25 @@ $(function (){
         tagName: 'div',
         className: 'photo',
         template: _.template($('#photo-template').html()),
-        initialize: function () {
+        initialize: function (options) {
             this.model.bind('change', this.render, this);
             this.model.bind('destroy', this.remove, this);
             this.addFilterData(this.model);
+            this.$el.hoverIntent(this.showDetails, this.hideDetails);
         },
+
+        showDetails: function () {
+            if ($(this).hasClass('details-open')) {
+                return;
+            } else {
+                $(this).addClass('details-open');
+            }
+        },
+
+        hideDetails: function () {
+            $(this).removeClass('details-open');
+        },
+
         events: {
             'mouseenter img': 'focus',
             'mouseout img': 'blur'
@@ -184,9 +198,14 @@ $(function (){
 
         setContent: function () {
             var filter = this.model.get('filter');
+            var link = this.model.get('link');
+            var lowRes = this.model.get('images').low_resolution.url;
+            var imgSrc = this.model.get('images').standard_resolution.url;
             this.$('.filter').html(filter);
-            this.$('img').attr('src',
-                this.model.attributes.images.low_resolution.url);
+            this.$('.thumbnail-image').attr('src', lowRes);
+
+            this.$('.img-link').attr('href', link);
+            this.$('.lg-image').attr('src', imgSrc);
             this.$el.addClass(Filterometry.stripFilterName(filter));
         },
 
@@ -268,7 +287,7 @@ $(function (){
         }
     });
 
-        Filterometry.App = new Filterometry.AppView();
+    Filterometry.App = new Filterometry.AppView();
 
     Filterometry.generalChartsConfig = {
         chart: {
