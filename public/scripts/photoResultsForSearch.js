@@ -35,12 +35,10 @@ $(function (){
         percentDone: 0,
         lastId: 0,
         parse: function (resp) {
-            console.log('parsing');
             this.next_max_id = resp.pagination.next_max_tag_id;
             return resp.data;
         },
         fetchNextSet: function (resp) {
-            console.log('fetchNextSet');
             this.fetchScroll = false;
             if (!this.next_max_id) {
                 var oldestPhoto = resp && resp.models && resp.models[resp.models.length - 1];
@@ -58,8 +56,7 @@ $(function (){
            if (!this.fetchScroll && this.percentDone < 1 && ((window.innerHeight + window.scrollY) >=
                    $('.photos').height())) {
                this.fetchScroll = true;
-               console.log('scroll fetch');
-               this.fetchNextSet();
+               this.fetchNewItems();
            }
         },
         updateProgressBar: function () {
@@ -120,13 +117,12 @@ $(function (){
         },
         fetchNewItems: function () {
             var id = this.idAttribute;
-            console.log('fetching NEW items');
             this.fetch({data: {'id': id, 'max_id': this.lastId || null},
                         add: true,
                         success: function (resp) {
                             this.mediaFetched += resp.models.length;
                             this.updateProgressBar();
-                            if (this.mediaFetched < 500) {
+                            if (this.mediaFetched < 500 || this.fetchScroll) {
                                 this.fetchNextSet(resp);
                             }
                         }.bind(this)
@@ -171,7 +167,6 @@ $(function (){
             'mouseout img': 'blur'
         },
         focus: function () {
-            console.log('mouseover');
             this.$('img').addClass('focused');
         },
         blur: function () {
