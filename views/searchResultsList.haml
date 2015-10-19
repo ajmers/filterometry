@@ -3,10 +3,9 @@
         %title Results
 
     %body
-        %nav.navbar
-            .container-fluid
-                .navbar-header.navbar-right
-                    = haml :searchBar
+        %div#header-container
+            %nav.navbar.navbar-default
+                = haml :searchBar
         #pageContent
             %div#users
                 %div.user-results-container.col-lg-12
