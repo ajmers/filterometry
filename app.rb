@@ -18,6 +18,7 @@ get "/" do
         puts session[:access_token]
         @signed_in = true
     end
+    @index = true
     haml :index
 end
 
